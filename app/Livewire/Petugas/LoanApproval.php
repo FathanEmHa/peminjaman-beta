@@ -4,11 +4,16 @@ namespace App\Livewire\Petugas;
 
 use Livewire\Component;
 use App\Models\Loan;
-use App\Models\ReturnRecord; // Asumsi model tabel returns lu namanya ReturnRecord atau sesuaikan
 use Illuminate\Support\Facades\DB;
 
 class LoanApproval extends Component
 {
+    // Property untuk input catatan kondisi alat saat konfirmasi pengembalian
+    public string $conditionNotes = '';
+
+    // ID loan yang sedang dalam proses konfirmasi pengembalian (untuk modal/inline form)
+    public ?int $confirmingReturnId = null;
+
     public function render()
     {
         // Ambil semua data peminjaman beserta relasi user dan barangnya
@@ -24,13 +29,13 @@ class LoanApproval extends Component
             'status' => 'approved',
             'approved_by' => auth()->id()
         ]);
-        
+
         DB::table('activity_logs')->insert([
             'user_id' => auth()->id(),
             'action' => 'Menyetujui peminjaman (ID: #' . $id . ')',
             'created_at' => now(),
         ]);
-        
+
         session()->flash('message', 'Peminjaman disetujui.');
     }
 
@@ -41,13 +46,13 @@ class LoanApproval extends Component
             'status' => 'rejected',
             'approved_by' => auth()->id()
         ]);
-        
+
         DB::table('activity_logs')->insert([
             'user_id' => auth()->id(),
             'action' => 'Menolak peminjaman (ID: #' . $id . ')',
             'created_at' => now(),
         ]);
-        
+
         session()->flash('message', 'Peminjaman ditolak.');
     }
 
@@ -55,44 +60,86 @@ class LoanApproval extends Component
     {
         $loan = Loan::findOrFail($id);
         $loan->update(['status' => 'ongoing']);
-        
+
         DB::table('activity_logs')->insert([
             'user_id' => auth()->id(),
             'action' => 'Menyerahkan alat ke peminjam (ID: #' . $id . ' - Ongoing)',
             'created_at' => now(),
         ]);
-        
+
         session()->flash('message', 'Status diperbarui: Alat sedang dipinjam (Ongoing).');
     }
 
-    public function markReturned($id)
+    /**
+     * Tampilkan form konfirmasi pengembalian inline untuk loan tertentu.
+     * Dipanggil saat Petugas klik tombol "Proses Pengembalian".
+     */
+    public function openReturnConfirmation(int $loanId): void
     {
-        $loan = Loan::findOrFail($id);
+        // Validasi: pastikan status memang awaiting_return
+        $loan = Loan::where('id', $loanId)
+            ->where('status', 'awaiting_return')
+            ->firstOrFail();
 
-        DB::transaction(function () use ($loan, $id) {
+        $this->confirmingReturnId = $loanId;
+        $this->conditionNotes = ''; // Reset catatan
+    }
+
+    /**
+     * Batalkan proses konfirmasi pengembalian (tutup form inline).
+     */
+    public function cancelReturnConfirmation(): void
+    {
+        $this->confirmingReturnId = null;
+        $this->conditionNotes = '';
+    }
+
+    /**
+     * Konfirmasi pengembalian oleh Petugas.
+     * Hanya bisa dieksekusi jika loan berstatus 'awaiting_return'
+     * (yang sudah diinisiasi oleh Peminjam sebelumnya).
+     */
+    public function confirmReturn(): void
+    {
+        $this->validate([
+            'conditionNotes' => 'nullable|string|max:500',
+        ]);
+
+        $loan = Loan::where('id', $this->confirmingReturnId)
+            ->where('status', 'awaiting_return') // Guard: hanya proses jika awaiting_return
+            ->firstOrFail();
+
+        DB::transaction(function () use ($loan) {
+            // 1. Update status loan menjadi 'returned'
             $loan->update(['status' => 'returned']);
 
+            // 2. Catat ke tabel returns
             DB::table('returns')->insert([
                 'loan_id' => $loan->id,
                 'returned_by' => $loan->user_id,
                 'received_by' => auth()->id(),
-                'return_date' => now(),
-                'condition_notes' => 'Dikembalikan dalam kondisi baik',
+                'return_date' => now()->toDateString(),
+                'condition_notes' => $this->conditionNotes ?: 'Dikembalikan dalam kondisi baik',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
+            // 3. Kembalikan stok asset
             foreach ($loan->items as $item) {
                 $item->asset->increment('stock', $item->quantity);
             }
-            
+
+            // 4. Log aktivitas
             DB::table('activity_logs')->insert([
                 'user_id' => auth()->id(),
-                'action' => 'Menerima pengembalian alat (ID: #' . $id . ' - Returned)',
+                'action' => 'Mengkonfirmasi pengembalian alat (Peminjaman ID: #' . $loan->id . ')',
                 'created_at' => now(),
             ]);
         });
 
-        session()->flash('message', 'Barang telah dikembalikan dan stok diperbarui.');
+        $this->confirmingReturnId = null;
+        $this->conditionNotes = '';
+
+        session()->flash('message', 'Pengembalian dikonfirmasi. Stok alat telah diperbarui.');
     }
 }

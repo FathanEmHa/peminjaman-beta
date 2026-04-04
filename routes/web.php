@@ -36,20 +36,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users', \App\Livewire\Admin\UserIndex::class)->name('admin.users');
         Route::get('/activity-logs', \App\Livewire\Admin\ActivityLog::class)->name('admin.logs');
         Route::get('/loans', \App\Livewire\Admin\LoanIndex::class)->name('admin.loans');
+        Route::get('/returns', \App\Livewire\Admin\ReturnIndex::class)->name('admin.returns');
+
     });
 
     // 2. PETUGAS ROUTES
     Route::middleware(['role:petugas'])->prefix('petugas')->group(function () {
-        
+
         // Pastikan ada ->name('petugas.dashboard') di ujungnya
         Route::get('/dashboard', \App\Livewire\Petugas\LoanApproval::class)->name('petugas.dashboard');
-        
+
         // Route cetak laporan
         Route::get('/laporan/cetak', function () {
             $loans = \App\Models\Loan::with(['items.asset', 'user'])->latest()->get();
             return view('cetak-laporan', compact('loans'));
         })->name('petugas.laporan.cetak');
-        
+
     });
 
     // 3. PEMINJAM ROUTES
@@ -59,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
         })->name('peminjam.dashboard');
 
         Route::get('/loans/create', \App\Livewire\Peminjam\LoanCreate::class)->name('peminjam.loans.create');
+        Route::get('/loans/history', \App\Livewire\Peminjam\LoanHistory::class)->name('peminjam.loans.history');
     });
 
 });
