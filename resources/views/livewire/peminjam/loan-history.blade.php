@@ -69,7 +69,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y, H:i') }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">
@@ -79,7 +79,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                         </svg>
-                                        {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y, H:i') }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
@@ -138,7 +138,7 @@
                                             <div class="flex flex-col items-center">
                                                 <span class="text-xs text-gray-500">Dikembalikan pada:</span>
                                                 <span
-                                                    class="text-xs font-bold text-emerald-600">{{ \Carbon\Carbon::parse($loan->return->return_date)->format('d M Y') }}</span>
+                                                    class="text-xs font-bold text-emerald-600">{{ \Carbon\Carbon::parse($loan->return->return_date)->format('d M Y, H:i') }}</span>
                                             </div>
                                         @else
                                             <span class="text-gray-400 text-xs italic">—</span>

@@ -11,7 +11,6 @@ class LoanApproval extends Component
     // Property untuk input catatan kondisi alat saat konfirmasi pengembalian
     public string $conditionNotes = '';
 
-    // ID loan yang sedang dalam proses konfirmasi pengembalian (untuk modal/inline form)
     public ?int $confirmingReturnId = null;
 
     public function render()
@@ -60,6 +59,11 @@ class LoanApproval extends Component
     {
         $loan = Loan::findOrFail($id);
         $loan->update(['status' => 'ongoing']);
+
+        // Kurangi stok alat karena fisik barang telah diserahkan (ongoing)
+        foreach ($loan->items as $item) {
+            $item->asset->decrement('stock', $item->quantity);
+        }
 
         DB::table('activity_logs')->insert([
             'user_id' => auth()->id(),

@@ -103,17 +103,17 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tgl Pinjam <span
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Pinjam <span
                                         class="text-red-500">*</span></label>
-                                <input type="date" wire:model="loanDate"
+                                <input type="datetime-local" wire:model="loanDate"
                                     class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                                 @error('loanDate') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tgl Kembali <span
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Kembali <span
                                         class="text-red-500">*</span></label>
-                                <input type="date" wire:model="returnDate"
+                                <input type="datetime-local" wire:model="returnDate"
                                     class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                                 @error('returnDate') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
                                 @enderror
@@ -308,7 +308,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y, H:i') }}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24"
@@ -316,7 +316,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                         </svg>
-                                        {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }}
+                                        {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y, H:i') }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">

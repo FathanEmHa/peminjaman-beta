@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class LoanCreate extends Component
 {
+    public $loan_date;
     public $return_date;
     public $selected_asset;
     public $quantity = 1;
@@ -56,15 +57,19 @@ class LoanCreate extends Component
     public function store()
     {
         $this->validate([
-            'return_date' => 'required|date|after:today',
-            'cart' => 'required|array|min:1',
+            'loan_date'   => 'required|date|after_or_equal:today',
+            'return_date' => 'required|date|after:loan_date',
+            'cart'        => 'required|array|min:1',
+        ], [
+            'loan_date.after_or_equal' => 'Tanggal pinjam minimal hari ini.',
+            'return_date.after'        => 'Tanggal kembali harus setelah tanggal pinjam.',
         ]);
 
         DB::transaction(function () {
             $loan = Loan::create([
                 'user_id' => auth()->id(),
                 'status' => 'pending',
-                'loan_date' => now(),
+                'loan_date' => $this->loan_date,
                 'return_date' => $this->return_date,
             ]);
 
@@ -74,9 +79,6 @@ class LoanCreate extends Component
                     'asset_id' => $item['asset_id'],
                     'quantity' => $item['quantity'],
                 ]);
-                
-                // TAMBAHKAN BARIS INI UNTUK MEMOTONG STOK
-                Asset::find($item['asset_id'])->decrement('stock', $item['quantity']);
             }
 
             // EKSEKUSI LOG DI SINI
