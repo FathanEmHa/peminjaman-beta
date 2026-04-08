@@ -92,4 +92,29 @@ class LoanCreate extends Component
         session()->flash('message', 'Peminjaman berhasil diajukan! Menunggu persetujuan petugas.');
         return redirect()->route('peminjam.dashboard');
     }
+
+    public function mount()
+    {
+        // 1. Tangkap parameter query 'asset_id' dari URL (berasal dari halaman Katalog)
+        $asset_id = request()->query('asset_id');
+
+        if ($asset_id) {
+            // Cek apakah aset dengan ID tersebut ada di database dan stoknya masih ada
+            $asset = Asset::where('id', $asset_id)->where('stock', '>', 0)->first();
+
+            if ($asset) {
+                // Jika valid, set properti ini biar otomatis terpilih di dropdown form
+                $this->selected_asset = $asset->id;
+            } else {
+                // Jika user iseng ubah ID di URL ke barang yang habis, kasih peringatan
+                session()->flash('error', 'Alat yang Anda pilih tidak tersedia atau stok habis.');
+            }
+        }
+        
+        // (Opsional) 2. Set default tanggal ke waktu sekarang biar user ga usah ngetik dari nol
+        // Format disesuaikan dengan input type="datetime-local" HTML5
+        $this->loan_date = now()->format('Y-m-d\TH:i');
+        // Default pinjam selama 1 hari
+        $this->return_date = now()->addDay()->format('Y-m-d\TH:i'); 
+    }
 }

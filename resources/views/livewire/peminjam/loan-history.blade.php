@@ -1,4 +1,4 @@
-<div class="mt-8">
+<div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-indigo-100 rounded-lg">
@@ -28,6 +28,33 @@
                 <span class="font-medium text-sm">{{ session('message') }}</span>
             </div>
         @endif
+
+        {{-- Section Search & Filter --}}
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="w-full sm:w-1/2 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input wire:model.live.debounce.300ms="search" type="text" 
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out sm:text-sm" 
+                    placeholder="Cari berdasarkan nama alat...">
+            </div>
+
+            <div class="w-full sm:w-1/3">
+                <select wire:model.live="status_filter" 
+                    class="block w-full py-2 px-3 border border-gray-200 bg-gray-50 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out">
+                    <option value="">Semua Status Riwayat</option>
+                    <option value="pending">Menunggu Disetujui</option>
+                    <option value="approved">Disetujui (Belum Diambil)</option>
+                    <option value="ongoing">Sedang Dipinjam</option>
+                    <option value="awaiting_return">Menunggu Konfirmasi Kembali</option>
+                    <option value="returned">Selesai Dikembalikan</option>
+                    <option value="rejected">Ditolak</option>
+                </select>
+            </div>
+        </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-100">
@@ -64,7 +91,7 @@
                                 </td>
                                 <td class="px-6 py-4 text-gray-600">
                                     <div class="flex items-center gap-2">
-                                        <svg class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24"
+                                    <svg class="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -156,10 +183,10 @@
                                             <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </div>
-                                        <p class="text-gray-500 text-sm">Anda belum pernah melakukan peminjaman alat.</p>
+                                        <p class="text-gray-500 text-sm">Tidak ada riwayat peminjaman yang cocok.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -167,6 +194,13 @@
                     </tbody>
                 </table>
             </div>
+            
+            {{-- Tambahkan Pagination di bawah tabel --}}
+            @if(method_exists($loans, 'links'))
+                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                    {{ $loans->links() }}
+                </div>
+            @endif
         </div>
 
     </div>

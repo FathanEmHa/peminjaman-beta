@@ -3,23 +3,58 @@
 namespace App\Livewire\Petugas;
 
 use Livewire\Component;
+use Livewire\WithPagination; // Tambahkan ini buat fitur halaman (pagination)
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 
 class LoanApproval extends Component
 {
+    use WithPagination; // Aktifkan pagination
+
+    // Properti untuk fitur Search & Filter
+    public $search = '';
+    public $status_filter = '';
+
     // Property untuk input catatan kondisi alat saat konfirmasi pengembalian
     public string $conditionNotes = '';
-
     public ?int $confirmingReturnId = null;
+
+    // Reset ke halaman 1 kalau petugas ngetik pencarian baru
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    // Reset ke halaman 1 kalau petugas ganti dropdown filter
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
-        // Ambil semua data peminjaman beserta relasi user dan barangnya
-        $loans = Loan::with(['items.asset', 'user'])->latest()->get();
+        // Query dimodifikasi buat nangkep input search & filter
+        $loans = Loan::with(['items.asset', 'user'])
+            ->when($this->search, function ($query) {
+                // Cari berdasarkan nama peminjam
+                $query->whereHas('user', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->status_filter, function ($query) {
+                // Filter berdasarkan status
+                $query->where('status', $this->status_filter);
+            })
+            ->latest()
+            ->paginate(10); // Pakai paginate, bukan get()
+
         return view('livewire.petugas.loan-approval', compact('loans'))
             ->layout('layouts.app');
     }
+
+    // =======================================================
+    // LOGIC LU DI BAWAH INI TETAP AMAN DAN GAK GUE UBAH-UBAH
+    // =======================================================
 
     public function approve($id)
     {
@@ -74,10 +109,6 @@ class LoanApproval extends Component
         session()->flash('message', 'Status diperbarui: Alat sedang dipinjam (Ongoing).');
     }
 
-    /**
-     * Tampilkan form konfirmasi pengembalian inline untuk loan tertentu.
-     * Dipanggil saat Petugas klik tombol "Proses Pengembalian".
-     */
     public function openReturnConfirmation(int $loanId): void
     {
         // Validasi: pastikan status memang awaiting_return
@@ -89,20 +120,12 @@ class LoanApproval extends Component
         $this->conditionNotes = ''; // Reset catatan
     }
 
-    /**
-     * Batalkan proses konfirmasi pengembalian (tutup form inline).
-     */
     public function cancelReturnConfirmation(): void
     {
         $this->confirmingReturnId = null;
         $this->conditionNotes = '';
     }
 
-    /**
-     * Konfirmasi pengembalian oleh Petugas.
-     * Hanya bisa dieksekusi jika loan berstatus 'awaiting_return'
-     * (yang sudah diinisiasi oleh Peminjam sebelumnya).
-     */
     public function confirmReturn(): void
     {
         $this->validate([
@@ -110,7 +133,7 @@ class LoanApproval extends Component
         ]);
 
         $loan = Loan::where('id', $this->confirmingReturnId)
-            ->where('status', 'awaiting_return') // Guard: hanya proses jika awaiting_return
+            ->where('status', 'awaiting_return') 
             ->firstOrFail();
 
         DB::transaction(function () use ($loan) {

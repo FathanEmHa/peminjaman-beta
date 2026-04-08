@@ -1,20 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Loan\CreateLoan;
-use App\Livewire\Loan\LoanApproval;
 
 Route::redirect('/', '/login');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
 Route::middleware(['auth'])->group(function () {
-
 
     Route::get('/dashboard', function () {
         $role = auth()->user()->role;
@@ -46,6 +36,9 @@ Route::middleware(['auth'])->group(function () {
         // Pastikan ada ->name('petugas.dashboard') di ujungnya
         Route::get('/dashboard', \App\Livewire\Petugas\LoanApproval::class)->name('petugas.dashboard');
 
+        // TAMBAHKAN ROUTE KATALOG PETUGAS DI SINI
+        Route::get('/katalog-aset', \App\Livewire\Petugas\AssetKatalog::class)->name('petugas.katalog');
+
         // Route cetak laporan
         Route::get('/laporan/cetak', function () {
             $loans = \App\Models\Loan::with(['items.asset', 'user'])->latest()->get();
@@ -59,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
             return view('dashboard-peminjam');
         })->name('peminjam.dashboard');
+
+        Route::get('/katalog', \App\Livewire\Peminjam\AssetList::class)->name('peminjam.katalog');
 
         Route::get('/loans/create', \App\Livewire\Peminjam\LoanCreate::class)->name('peminjam.loans.create');
         Route::get('/loans/history', \App\Livewire\Peminjam\LoanHistory::class)->name('peminjam.loans.history');

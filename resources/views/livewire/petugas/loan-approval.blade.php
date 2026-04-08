@@ -29,6 +29,33 @@
             </div>
         @endif
 
+        {{-- Section Search & Filter --}}
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="w-full sm:w-1/2 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input wire:model.live.debounce.300ms="search" type="text" 
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out sm:text-sm" 
+                    placeholder="Cari nama peminjam...">
+            </div>
+
+            <div class="w-full sm:w-1/3">
+                <select wire:model.live="status_filter" 
+                    class="block w-full py-2 px-3 border border-gray-200 bg-gray-50 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out">
+                    <option value="">Semua Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="awaiting_return">Tunggu Konfirmasi</option>
+                    <option value="returned">Returned</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+        </div>
+
         {{-- Card Container --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
 
@@ -264,6 +291,13 @@
                     </tbody>
                 </table>
             </div>
+            
+            {{-- Tambahkan Pagination jika diperlukan --}}
+            @if(method_exists($loans, 'links'))
+                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                    {{ $loans->links() }}
+                </div>
+            @endif
         </div>
     </div>
 </div>

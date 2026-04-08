@@ -3,32 +3,55 @@
 namespace App\Livewire\Peminjam;
 
 use Livewire\Component;
+use Livewire\WithPagination; // Wajib ditambahkan untuk fitur filter/halaman
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 
 class LoanHistory extends Component
 {
-    public function render()
-    {
-        // Ambil data peminjaman khusus untuk user yang sedang login
-        $loans = Loan::with(['items.asset', 'return'])
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+    use WithPagination;
 
-        return view('livewire.peminjam.loan-history', compact('loans'));
+    public $search = '';
+    public $status_filter = '';
+
+    // Reset ke halaman 1 kalau peminjam ngetik pencarian baru
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 
-    /**
-     * Inisiasi pengembalian oleh Peminjam.
-     * Mengubah status loan dari 'ongoing' menjadi 'awaiting_return'.
-     * Petugas akan mengkonfirmasi pengembalian ini selanjutnya.
-     */
+    // Reset ke halaman 1 kalau peminjam ganti status filter
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function render()
+    {
+        $loans = Loan::with(['items.asset', 'return'])
+            ->where('user_id', auth()->id()) // Pastikan hanya data miliknya sendiri
+            ->when($this->search, function ($query) {
+                // Pencarian berdasarkan nama alat yang dipinjam
+                $query->whereHas('items.asset', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->status_filter, function ($query) {
+                // Filter berdasarkan status
+                $query->where('status', $this->status_filter);
+            })
+            ->latest()
+            ->paginate(10); // Ubah dari take(3)->get() menjadi paginate()
+
+        return view('livewire.peminjam.loan-history', compact('loans'))
+            ->layout('layouts.app'); // Jangan lupa set layout
+    }
+
     public function requestReturn(int $loanId): void
     {
         $loan = Loan::where('id', $loanId)
-            ->where('user_id', auth()->id()) // Pastikan loan milik user yang login
-            ->where('status', 'ongoing')     // Hanya bisa diinisiasi saat ongoing
+            ->where('user_id', auth()->id()) 
+            ->where('status', 'ongoing')     
             ->firstOrFail();
 
         $loan->update(['status' => 'awaiting_return']);

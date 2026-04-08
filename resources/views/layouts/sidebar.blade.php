@@ -35,6 +35,9 @@
         @endif
 
         @if(auth()->user()->role === 'petugas')
+            <a href="{{ route('petugas.katalog') }}" target="_blank" wire:navigate.hover
+                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition text-gray-300">Katalog
+                Assets</a>
             <div class="pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Operasional</div>
             <a href="{{ route('petugas.laporan.cetak') }}" target="_blank" wire:navigate.hover
                 class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition text-gray-300">Cetak
@@ -42,6 +45,8 @@
         @endif
 
         @if(auth()->user()->role === 'peminjam')
+            <a href="{{ route('peminjam.katalog') }}" wire:navigate.hover
+                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('peminjam.katalog') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">Katalog Alat</a>
             <div class="pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Transaksi</div>
             <a href="{{ route('peminjam.loans.create') }}" wire:navigate.hover
                 class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('peminjam.loans.create') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">Ajukan
