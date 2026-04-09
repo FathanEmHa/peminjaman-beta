@@ -8,6 +8,7 @@ use App\Models\LoanItem;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LoanIndex extends Component
 {
@@ -158,6 +159,11 @@ class LoanIndex extends Component
                 }
             }
 
+            // Jika admin langsung nge-set status ke returned saat create (jarang terjadi tapi kita amankan)
+            if ($this->status === 'returned') {
+                $this->handleAdminReturnInsertion($loan);
+            }
+
             DB::table('activity_logs')->insert([
                 'user_id' => auth()->id(),
                 'action' => 'Admin membuat data peminjaman baru (ID: #' . $loan->id . ')',
@@ -200,21 +206,28 @@ class LoanIndex extends Component
             'returnDate' => 'required|date|after_or_equal:loanDate',
         ]);
 
-        $loan = Loan::findOrFail($this->editId);
+        $loan = Loan::with('items.asset')->findOrFail($this->editId);
 
-        $loan->update([
-            'user_id' => $this->userId,
-            'approved_by' => $this->approvedBy ?: null,
-            'status' => $this->status,
-            'loan_date' => $this->loanDate,
-            'return_date' => $this->returnDate,
-        ]);
+        DB::transaction(function () use ($loan) {
+            $loan->update([
+                'user_id' => $this->userId,
+                'approved_by' => $this->approvedBy ?: null,
+                'status' => $this->status,
+                'loan_date' => $this->loanDate,
+                'return_date' => $this->returnDate,
+            ]);
 
-        DB::table('activity_logs')->insert([
-            'user_id' => auth()->id(),
-            'action' => 'Admin mengubah data peminjaman (ID: #' . $this->editId . ')',
-            'created_at' => now(),
-        ]);
+            // Jika admin maksa status jadi returned lewat edit
+            if ($this->status === 'returned') {
+                $this->handleAdminReturnInsertion($loan);
+            }
+
+            DB::table('activity_logs')->insert([
+                'user_id' => auth()->id(),
+                'action' => 'Admin mengubah data peminjaman (ID: #' . $this->editId . ')',
+                'created_at' => now(),
+            ]);
+        });
 
         $this->resetFields();
         session()->flash('message', 'Data peminjaman berhasil diperbarui.');
@@ -231,5 +244,44 @@ class LoanIndex extends Component
         ]);
 
         session()->flash('message', 'Data peminjaman beserta detail barang berhasil dihapus.');
+    }
+
+    // ─── HELPER: Tangani Insert ke tabel Returns jika Admin mengubah status jadi Returned ───
+    private function handleAdminReturnInsertion($loan)
+    {
+        // Cek apakah data return sudah ada (biar gak double insert kalau diedit berkali-kali)
+        $existingReturn = DB::table('returns')->where('loan_id', $loan->id)->first();
+
+        if (!$existingReturn) {
+            $lateFee = 0;
+            $expectedReturnDate = Carbon::parse($this->returnDate)->startOfDay();
+            $today = now()->startOfDay();
+
+            // Hitung denda keterlambatan kalau sudah lewat batas
+            if ($today->greaterThan($expectedReturnDate)) {
+                $diffInDays = $today->diffInDays($expectedReturnDate);
+                $lateFee = $diffInDays * 5000;
+            }
+
+            $fineStatus = ($lateFee > 0) ? 'unpaid' : 'none';
+
+            DB::table('returns')->insert([
+                'loan_id' => $loan->id,
+                'returned_by' => $this->userId,
+                'received_by' => auth()->id(),
+                'return_date' => now()->toDateString(),
+                'condition_notes' => 'Status diselesaikan manual oleh Admin lewat Edit Form',
+                'late_fee' => $lateFee,
+                'damage_fee' => 0, // Admin gak bisa isi denda kerusakan dari form ini
+                'fine_status' => $fineStatus,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Kembalikan stok fisik aset karena barang dianggap sudah kembali
+            foreach ($loan->items as $item) {
+                $item->asset->increment('stock', $item->quantity);
+            }
+        }
     }
 }

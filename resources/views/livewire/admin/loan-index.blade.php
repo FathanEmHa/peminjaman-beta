@@ -18,12 +18,9 @@
 
         {{-- Flash Message --}}
         @if (session()->has('message'))
-            <div
-                class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl shadow-sm">
+            <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
                 <span class="font-medium text-sm">{{ session('message') }}</span>
             </div>
@@ -94,9 +91,10 @@
                                 <option value="pending">Pending</option>
                                 <option value="approved">Approved</option>
                                 <option value="ongoing">Ongoing</option>
-                                <option value="awaiting_return">Menunggu Konfirmasi</option>
+                                <option value="awaiting_return">Awaiting Return</option>
                                 <option value="returned">Returned</option>
                                 <option value="rejected">Rejected</option>
+                                <option value="overdue">Overdue</option>
                             </select>
                             @error('status') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
@@ -252,7 +250,7 @@
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari peminjam..."
+                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari peminjam/ID..."
                             class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                     </div>
                     @if(!$showForm)
@@ -331,6 +329,7 @@
                                             'awaiting_return' => 'bg-orange-100 text-orange-700 border-orange-200',
                                             'returned' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                             'rejected' => 'bg-red-100 text-red-700 border-red-200',
+                                            'overdue' => 'bg-rose-100 text-rose-700 border-rose-200',
                                         ];
                                         $labels = [
                                             'pending' => 'Pending',
@@ -339,14 +338,35 @@
                                             'awaiting_return' => 'Menunggu Konfirmasi',
                                             'returned' => 'Returned',
                                             'rejected' => 'Rejected',
+                                            'overdue' => 'OVERDUE',
                                         ];
+                                        
                                         $badgeClass = $badges[$loan->status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
-                                        $label = $labels[$loan->status] ?? strtoupper($loan->status);
+                                        $labelText = $labels[$loan->status] ?? $loan->status;
+                                        
+                                        $estLateFee = 0;
+                                        if ($loan->status === 'overdue' && $loan->return_date) {
+                                            $expectedReturnDate = \Carbon\Carbon::parse($loan->return_date);
+                                            $now = now();
+                                            if ($now->greaterThan($expectedReturnDate)) {
+                                                $diffInMinutes = $now->diffInMinutes($expectedReturnDate);
+                                                $diffInDays = ceil($diffInMinutes / 1440) ?: 1;
+                                                $estLateFee = $diffInDays * 5000;
+                                            }
+                                        }
                                     @endphp
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border {{ $badgeClass }}">
-                                        {{ $label }}
+
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $badgeClass }} uppercase tracking-wide">
+                                        {{ $labelText }}
                                     </span>
+
+                                    @if($loan->status === 'overdue')
+                                        <div class="mt-2 flex flex-col items-center">
+                                            <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+                                                Denda: Rp {{ number_format($estLateFee, 0, ',', '.') }}
+                                            </span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">

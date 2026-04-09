@@ -14,6 +14,15 @@ class ReturnModel extends Model
         'received_by',
         'return_date',
         'condition_notes',
+        'late_fee',
+        'damage_fee',
+        'fine_status',
+    ];
+
+    protected $casts = [
+        'late_fee'    => 'integer',
+        'damage_fee'  => 'integer',
+        'fine_status' => 'string',
     ];
 
     /**

@@ -34,13 +34,13 @@
                         @endforeach
                     </ul>
                 </td>
-                <td class="border border-black px-4 py-2">{{ $loan->loan_date }}</td>
-                <td class="border border-black px-4 py-2">{{ $loan->return_date }}</td>
+                <td class="border border-black px-4 py-2">{{ \Carbon\Carbon::parse($loan->loan_date)->format('d/m/Y') }}</td>
+                <td class="border border-black px-4 py-2">{{ \Carbon\Carbon::parse($loan->return_date)->format('d/m/Y') }}</td>
                 <td class="border border-black px-4 py-2 text-center uppercase font-bold text-xs">{{ $loan->status }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="border border-black px-4 py-6 text-center italic text-gray-600">Belum ada data peminjaman.</td>
+                <td colspan="6" class="border border-black px-4 py-6 text-center italic text-gray-600">Belum ada data peminjaman yang sesuai dengan filter.</td>
             </tr>
             @endforelse
         </tbody>

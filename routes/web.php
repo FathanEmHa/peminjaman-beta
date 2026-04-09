@@ -39,12 +39,11 @@ Route::middleware(['auth'])->group(function () {
         // TAMBAHKAN ROUTE KATALOG PETUGAS DI SINI
         Route::get('/katalog-aset', \App\Livewire\Petugas\AssetKatalog::class)->name('petugas.katalog');
 
-        // Route cetak laporan
-        Route::get('/laporan/cetak', function () {
-            $loans = \App\Models\Loan::with(['items.asset', 'user'])->latest()->get();
-            return view('cetak-laporan', compact('loans'));
-        })->name('petugas.laporan.cetak');
+        // === TAMBAHIN BARIS INI BIAR GAK NGACO ===
+        Route::get('/laporan', \App\Livewire\Petugas\ReportFilter::class)->name('petugas.laporan');
 
+        // Route cetak laporan (yang proses filternya)
+        Route::get('/laporan/cetak', [\App\Http\Controllers\Petugas\ReportController::class, 'print'])->name('petugas.laporan.cetak');
     });
 
     // 3. PEMINJAM ROUTES

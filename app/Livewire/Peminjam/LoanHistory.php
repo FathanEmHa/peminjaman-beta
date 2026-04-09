@@ -3,7 +3,7 @@
 namespace App\Livewire\Peminjam;
 
 use Livewire\Component;
-use Livewire\WithPagination; // Wajib ditambahkan untuk fitur filter/halaman
+use Livewire\WithPagination;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 
@@ -14,13 +14,15 @@ class LoanHistory extends Component
     public $search = '';
     public $status_filter = '';
 
-    // Reset ke halaman 1 kalau peminjam ngetik pencarian baru
+    // Properti untuk Modal Info Denda
+    public $showModal = false;
+    public $selectedLoan = null;
+
     public function updatingSearch()
     {
         $this->resetPage();
     }
 
-    // Reset ke halaman 1 kalau peminjam ganti status filter
     public function updatingStatusFilter()
     {
         $this->resetPage();
@@ -29,29 +31,27 @@ class LoanHistory extends Component
     public function render()
     {
         $loans = Loan::with(['items.asset', 'return'])
-            ->where('user_id', auth()->id()) // Pastikan hanya data miliknya sendiri
+            ->where('user_id', auth()->id())
             ->when($this->search, function ($query) {
-                // Pencarian berdasarkan nama alat yang dipinjam
                 $query->whereHas('items.asset', function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%');
                 });
             })
             ->when($this->status_filter, function ($query) {
-                // Filter berdasarkan status
                 $query->where('status', $this->status_filter);
             })
             ->latest()
-            ->paginate(10); // Ubah dari take(3)->get() menjadi paginate()
+            ->paginate(10);
 
         return view('livewire.peminjam.loan-history', compact('loans'))
-            ->layout('layouts.app'); // Jangan lupa set layout
+            ->layout('layouts.app');
     }
 
     public function requestReturn(int $loanId): void
     {
         $loan = Loan::where('id', $loanId)
             ->where('user_id', auth()->id()) 
-            ->where('status', 'ongoing')     
+            ->whereIn('status', ['ongoing', 'overdue'])     
             ->firstOrFail();
 
         $loan->update(['status' => 'awaiting_return']);
@@ -63,5 +63,18 @@ class LoanHistory extends Component
         ]);
 
         session()->flash('message', 'Permintaan pengembalian berhasil dikirim. Menunggu konfirmasi Petugas.');
+    }
+
+    // --- LOGIC MODAL ---
+    public function openInfoModal($id)
+    {
+        $this->selectedLoan = Loan::with('return')->findOrFail($id);
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->selectedLoan = null;
     }
 }
