@@ -77,4 +77,36 @@ class LoanHistory extends Component
         $this->showModal = false;
         $this->selectedLoan = null;
     }
+
+    public function cancelLoan($id)
+    {
+        // Pastikan user cuma bisa ngebatalin peminjaman milik dia sendiri
+        $loan = Loan::with('items.asset')->where('user_id', auth()->id())->findOrFail($id);
+
+        // Proteksi ganda (backend validation) biar user gak iseng inject script pas statusnya ongoing
+        if (!in_array($loan->status, ['pending', 'approved'])) {
+            session()->flash('error', 'Peminjaman ini sudah tidak bisa dibatalkan.');
+            return;
+        }
+
+        DB::transaction(function () use ($loan) {
+            // Kalau statusnya udah approved, balikin stoknya!
+            if ($loan->status === 'approved') {
+                foreach ($loan->items as $item) {
+                    $item->asset->increment('stock', $item->quantity);
+                }
+            }
+
+            // Ubah status jadi cancelled
+            $loan->update(['status' => 'cancelled']);
+
+            DB::table('activity_logs')->insert([
+                'user_id' => auth()->id(),
+                'action' => 'User membatalkan peminjaman (ID: #' . $loan->id . ')',
+                'created_at' => now(),
+            ]);
+        });
+
+        session()->flash('message', 'Peminjaman berhasil dibatalkan.');
+    }
 }

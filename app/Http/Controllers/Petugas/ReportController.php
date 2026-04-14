@@ -34,6 +34,15 @@ class ReportController extends Controller
             } elseif ($request->period === 'this_month') {
                 $query->whereMonth('created_at', Carbon::now()->month)
                       ->whereYear('created_at', Carbon::now()->year);
+            } elseif ($request->period === 'custom') {
+                // Pastikan kedua tanggal diisi
+                if ($request->filled(['start_date', 'end_date'])) {
+                    // startOfDay() -> 00:00:00, endOfDay() -> 23:59:59
+                    $start = Carbon::parse($request->start_date)->startOfDay();
+                    $end = Carbon::parse($request->end_date)->endOfDay();
+                    
+                    $query->whereBetween('created_at', [$start, $end]);
+                }
             }
         }
 

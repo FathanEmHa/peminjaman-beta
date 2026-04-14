@@ -140,16 +140,24 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center gap-2">
+                                    <div class="flex items-center justify-center gap-2 w-full">
                                         @if($loan->status == 'pending')
-                                            <button wire:click="approve({{ $loan->id }})" class="inline-flex justify-center px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">Setujui</button>
-                                            <button wire:click="reject({{ $loan->id }})" wire:confirm="Yakin menolak peminjaman ini?" class="inline-flex justify-center px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-xs font-bold transition-colors">Tolak</button>
+                                            <button wire:click="approve({{ $loan->id }})" class="flex-1 inline-flex justify-center px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">Setujui</button>
+                                            <button wire:click="reject({{ $loan->id }})" wire:confirm="Yakin menolak peminjaman ini?" class="flex-1 inline-flex justify-center px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-xs font-bold transition-colors">Tolak</button>
+                                        
                                         @elseif($loan->status == 'approved')
-                                            <button wire:click="markOngoing({{ $loan->id }})" class="w-full px-4 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded text-xs font-bold transition-colors">Serahkan Alat</button>
+                                            <button wire:click="markOngoing({{ $loan->id }})" class="flex-1 inline-flex justify-center px-2 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded text-[11px] font-bold transition-colors">
+                                                Serahkan
+                                            </button>
+                                            <button wire:click="cancel({{ $loan->id }})" wire:confirm="Yakin ingin membatalkan peminjaman yang sudah disetujui ini? Stok akan dikembalikan." class="flex-1 inline-flex justify-center px-2 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-[11px] font-bold transition-colors">
+                                                Batal
+                                            </button>
+                                            
                                         @elseif(in_array($loan->status, ['awaiting_return', 'overdue']))
                                             <button wire:click="openReturnConfirmation({{ $loan->id }})" class="w-full px-4 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded text-xs font-bold transition-colors shadow-sm">
                                                 Proses Pengembalian
                                             </button>
+                                            
                                         @elseif($loan->status == 'returned')
                                             @php
                                                 $hasFine = false;
@@ -166,6 +174,7 @@
                                             @else
                                                 <span class="text-xs font-bold text-emerald-600 px-3 py-1.5 bg-emerald-50 rounded">Selesai</span>
                                             @endif
+                                            
                                         @else
                                             <span class="text-gray-400 text-xs italic">—</span>
                                         @endif

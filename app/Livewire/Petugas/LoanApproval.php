@@ -68,33 +68,36 @@ class LoanApproval extends Component
     {
         $loan = Loan::with('items.asset')->findOrFail($id);
 
+        // 1. Cek ketersediaan stok fisik langsung
         foreach ($loan->items as $item) {
             $asset = $item->asset;
-            $booked_qty = \App\Models\LoanItem::where('asset_id', $asset->id)
-                ->whereHas('loan', function ($query) {
-                    $query->where('status', 'approved');
-                })->sum('quantity');
 
-            $sisa_stok_aman = $asset->stock - $booked_qty;
-
-            if ($item->quantity > $sisa_stok_aman) {
-                session()->flash('error', "Gagal menyetujui! Stok aman '{$asset->name}' tidak cukup. (Stok Fisik: {$asset->stock}, Sedang Di-booking: {$booked_qty})");
+            if ($item->quantity > $asset->stock) {
+                session()->flash('error', "Gagal menyetujui! Stok '{$asset->name}' tidak cukup. (Sisa: {$asset->stock})");
                 return;
             }
         }
 
-        $loan->update([
-            'status' => 'approved',
-            'approved_by' => auth()->id()
-        ]);
+        // 2. Kalau stok aman, update status dan kurangi stok pakai Transaction
+        DB::transaction(function () use ($loan, $id) {
+            $loan->update([
+                'status' => 'approved',
+                'approved_by' => auth()->id()
+            ]);
 
-        DB::table('activity_logs')->insert([
-            'user_id' => auth()->id(),
-            'action' => 'Menyetujui peminjaman (ID: #' . $id . ')',
-            'created_at' => now(),
-        ]);
+            // Stok langsung dikurangi di sini
+            foreach ($loan->items as $item) {
+                $item->asset->decrement('stock', $item->quantity);
+            }
 
-        session()->flash('message', 'Peminjaman disetujui.');
+            DB::table('activity_logs')->insert([
+                'user_id' => auth()->id(),
+                'action' => 'Menyetujui peminjaman & memotong stok (ID: #' . $id . ')',
+                'created_at' => now(),
+            ]);
+        });
+
+        session()->flash('message', 'Peminjaman disetujui dan stok berhasil dikurangi.');
     }
 
     public function reject($id)
@@ -118,10 +121,6 @@ class LoanApproval extends Component
     {
         $loan = Loan::findOrFail($id);
         $loan->update(['status' => 'ongoing']);
-
-        foreach ($loan->items as $item) {
-            $item->asset->decrement('stock', $item->quantity);
-        }
 
         DB::table('activity_logs')->insert([
             'user_id' => auth()->id(),
@@ -241,5 +240,40 @@ class LoanApproval extends Component
 
         $this->closeFineModal();
         session()->flash('message', 'Status denda berhasil diperbarui menjadi Lunas.');
+    }
+
+    public function cancel($id)
+    {
+        $loan = Loan::with('items.asset')->findOrFail($id);
+
+        // Pastikan hanya status pending dan approved yang bisa dibatalkan
+        if (!in_array($loan->status, ['approved'])) {
+            session()->flash('error', 'Peminjaman ini sudah tidak bisa dibatalkan (mungkin sedang ongoing atau sudah selesai).');
+            return;
+        }
+
+        DB::transaction(function () use ($loan, $id) {
+            // Kalau statusnya sudah approved (stok sudah terpotong), maka kembalikan stoknya
+            if ($loan->status === 'approved') {
+                foreach ($loan->items as $item) {
+                    $item->asset->increment('stock', $item->quantity);
+                }
+            }
+
+            // Update status menjadi cancelled dan catat siapa petugas yang membatalkan
+            $loan->update([
+                'status' => 'cancelled',
+                'approved_by' => auth()->id() // Menyimpan ID petugas yang membatalkan
+            ]);
+
+            // Catat ke log aktivitas
+            DB::table('activity_logs')->insert([
+                'user_id' => auth()->id(),
+                'action' => 'Petugas membatalkan peminjaman (ID: #' . $id . ')',
+                'created_at' => now(),
+            ]);
+        });
+
+        session()->flash('message', 'Peminjaman berhasil dibatalkan dan stok telah disesuaikan.');
     }
 }

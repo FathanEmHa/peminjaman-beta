@@ -125,13 +125,14 @@
                                             'overdue' => 'bg-rose-100 text-rose-700 border-rose-200',
                                         ];
                                         $labels = [
-                                            'pending' => 'Pending',
-                                            'approved' => 'Approved',
-                                            'ongoing' => 'Ongoing',
-                                            'awaiting_return' => 'Awaiting Return',
-                                            'returned' => 'Returned',
-                                            'rejected' => 'Rejected',
+                                            'pending' => 'PENDING',
+                                            'approved' => 'APPROVED',
+                                            'ongoing' => 'ONGOING',
+                                            'awaiting_return' => 'AWAITING RETURN',
+                                            'returned' => 'RETURNED',
+                                            'rejected' => 'REJECTED',
                                             'overdue' => 'OVERDUE',
+                                            'cancelled' => 'CANCELLED',
                                         ];
 
                                         $badgeClass = $badges[$loan->status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
@@ -155,7 +156,7 @@
                                             <span class="text-xs text-orange-600 italic">Menunggu Petugas...</span>
                                         @elseif($loan->status == 'returned' && !$hasFineRecord)
                                             <span class="text-xs font-bold text-emerald-600">Alat Kembali</span>
-                                        @elseif($loan->status == 'rejected' || $loan->status == 'pending' || $loan->status == 'approved')
+                                        @elseif($loan->status == 'rejected' || $loan->status == 'cancelled')
                                             <span class="text-gray-400 text-xs">—</span>
                                         @endif
 
@@ -164,6 +165,12 @@
                                             <button wire:click="openInfoModal({{ $loan->id }})" 
                                                 class="inline-flex items-center justify-center px-3 py-1 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 hover:text-rose-700 rounded text-[10px] font-bold transition-colors w-full uppercase tracking-wider">
                                                 Info Denda
+                                            </button>
+                                        @endif
+
+                                        @if(in_array($loan->status, ['pending', 'approved']))
+                                            <button wire:click="cancelLoan({{ $loan->id }})" class="flex-1 inline-flex justify-center px-2 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-[11px] font-bold transition-colors">
+                                                Batalkan Peminjaman
                                             </button>
                                         @endif
                                     </div>
