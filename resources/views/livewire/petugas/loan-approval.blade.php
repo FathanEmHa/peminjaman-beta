@@ -56,7 +56,6 @@
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="ongoing">Ongoing</option>
-                    <option value="awaiting_return">Tunggu Konfirmasi</option>
                     <option value="returned">Returned</option>
                     <option value="rejected">Rejected</option>
                     <option value="overdue">Overdue</option>
@@ -125,7 +124,6 @@
                                             'pending' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                                             'approved' => 'bg-blue-100 text-blue-700 border-blue-200',
                                             'ongoing' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
-                                            'awaiting_return' => 'bg-orange-100 text-orange-700 border-orange-200',
                                             'returned' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                             'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                             'overdue' => 'bg-rose-100 text-rose-700 border-rose-200',
@@ -153,7 +151,8 @@
                                                 Batal
                                             </button>
                                             
-                                        @elseif(in_array($loan->status, ['awaiting_return', 'overdue']))
+                                        {{-- BUTTON PROSES PENGEMBALIAN SEKARANG AKTIF DI STATUS ONGOING/OVERDUE --}}
+                                        @elseif(in_array($loan->status, ['ongoing', 'overdue']))
                                             <button wire:click="openReturnConfirmation({{ $loan->id }})" class="w-full px-4 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded text-xs font-bold transition-colors shadow-sm">
                                                 Proses Pengembalian
                                             </button>

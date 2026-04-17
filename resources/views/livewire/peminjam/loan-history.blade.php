@@ -49,7 +49,6 @@
                     <option value="pending">Menunggu Disetujui</option>
                     <option value="approved">Disetujui (Belum Diambil)</option>
                     <option value="ongoing">Sedang Dipinjam</option>
-                    <option value="awaiting_return">Menunggu Konfirmasi Kembali</option>
                     <option value="returned">Selesai Dikembalikan</option>
                     <option value="rejected">Ditolak</option>
                     <option value="overdue">Overdue</option>
@@ -119,16 +118,15 @@
                                             'pending' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
                                             'approved' => 'bg-blue-100 text-blue-700 border-blue-200',
                                             'ongoing' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
-                                            'awaiting_return' => 'bg-orange-100 text-orange-700 border-orange-200',
                                             'returned' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                             'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                             'overdue' => 'bg-rose-100 text-rose-700 border-rose-200',
+                                            'cancelled' => 'bg-gray-100 text-gray-700 border-gray-200',
                                         ];
                                         $labels = [
                                             'pending' => 'PENDING',
                                             'approved' => 'APPROVED',
                                             'ongoing' => 'ONGOING',
-                                            'awaiting_return' => 'AWAITING RETURN',
                                             'returned' => 'RETURNED',
                                             'rejected' => 'REJECTED',
                                             'overdue' => 'OVERDUE',
@@ -146,15 +144,7 @@
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex flex-col items-center gap-2">
                                         {{-- Aksi Utama --}}
-                                        @if(in_array($loan->status, ['ongoing', 'overdue']))
-                                            <button wire:click="requestReturn({{ $loan->id }})"
-                                                wire:confirm="Apakah Anda yakin ingin mengajukan pengembalian untuk peminjaman #{{ $loan->id }}? Pastikan alat diserahkan kepada Petugas."
-                                                class="inline-flex items-center justify-center px-4 py-1.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 hover:text-orange-700 rounded-md text-xs font-bold transition-colors w-full">
-                                                Kembalikan
-                                            </button>
-                                        @elseif($loan->status == 'awaiting_return')
-                                            <span class="text-xs text-orange-600 italic">Menunggu Petugas...</span>
-                                        @elseif($loan->status == 'returned' && !$hasFineRecord)
+                                        @if($loan->status == 'returned' && !$hasFineRecord)
                                             <span class="text-xs font-bold text-emerald-600">Alat Kembali</span>
                                         @elseif($loan->status == 'rejected' || $loan->status == 'cancelled')
                                             <span class="text-gray-400 text-xs">—</span>
@@ -217,30 +207,28 @@
                     </div>
 
                     @php
-                        $estLateFee = 0;
+                        // Panggil accessor nominal_denda dari Model secara langsung
+                        $estLateFee = $selectedLoan->nominal_denda; 
+                        
                         $actualLateFee = 0;
                         $actualDamageFee = 0;
+                        $damageDescription = null; // Tambahan variable buat nangkep deskripsi
                         $statusPembayaran = 'Menunggu';
 
-                        // Jika masih Overdue (belum diselesaikan petugas)
-                        if (in_array($selectedLoan->status, ['ongoing', 'awaiting_return', 'overdue']) && $selectedLoan->return_date) {
-                            $expected = \Carbon\Carbon::parse($selectedLoan->return_date);
-                            if (now()->greaterThan($expected)) {
-                                $diffInDays = ceil(now()->diffInMinutes($expected) / 1440) ?: 1;
-                                $estLateFee = $diffInDays * 5000;
-                            }
-                        }
-
-                        // Jika sudah Returned (sudah dicatat petugas)
+                        // Jika sudah Returned (sudah dicatat petugas finalnya)
                         if ($selectedLoan->status == 'returned' && $selectedLoan->return) {
                             $actualLateFee = $selectedLoan->return->late_fee ?? 0;
                             $actualDamageFee = $selectedLoan->return->damage_fee ?? 0;
+                            
+                            // NOTE: Sesuaikan 'notes' dengan nama kolom asli di table returns/pengembalian lu ya
+                            $damageDescription = $selectedLoan->return->condition_notes ?? null; 
+                            
                             $statusPembayaran = $selectedLoan->return->fine_status == 'paid' ? 'LUNAS' : 'BELUM LUNAS';
                         }
                     @endphp
 
                     <div class="space-y-3 text-sm">
-                        @if(in_array($selectedLoan->status, ['ongoing', 'awaiting_return', 'overdue']))
+                        @if(in_array($selectedLoan->status, ['ongoing', 'overdue']))
                             <div class="flex justify-between items-center border-b border-gray-200 pb-2">
                                 <span class="text-gray-600">Estimasi Keterlambatan</span>
                                 <span class="font-bold text-rose-600">Rp {{ number_format($estLateFee, 0, ',', '.') }}</span>
@@ -253,10 +241,23 @@
                                 <span class="text-gray-600">Denda Keterlambatan</span>
                                 <span class="font-medium text-gray-800">Rp {{ number_format($actualLateFee, 0, ',', '.') }}</span>
                             </div>
-                            <div class="flex justify-between items-center border-b border-gray-200 pb-2">
-                                <span class="text-gray-600">Denda Kerusakan</span>
-                                <span class="font-medium text-gray-800">Rp {{ number_format($actualDamageFee, 0, ',', '.') }}</span>
+                            
+                            {{-- Modifikasi Denda Kerusakan & Deskripsi --}}
+                            <div class="border-b border-gray-200 pb-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Denda Kerusakan</span>
+                                    <span class="font-medium text-gray-800">Rp {{ number_format($actualDamageFee, 0, ',', '.') }}</span>
+                                </div>
+                                
+                                {{-- Munculin box deskripsi kalau denda kerusakan ada nilainya dan deskripsinya ga kosong --}}
+                                @if($actualDamageFee > 0 && !empty($damageDescription))
+                                    <div class="mt-2 p-2.5 bg-white/60 rounded-lg border border-rose-200 text-xs">
+                                        <span class="block text-rose-800 font-bold mb-0.5">Catatan Kerusakan:</span>
+                                        <span class="text-gray-600 italic break-words">"{{ $damageDescription }}"</span>
+                                    </div>
+                                @endif
                             </div>
+
                             <div class="flex justify-between items-center pt-2">
                                 <span class="font-bold text-gray-800 uppercase tracking-wider text-xs">Total Tagihan</span>
                                 <span class="font-black text-rose-600 text-lg">Rp {{ number_format($actualLateFee + $actualDamageFee, 0, ',', '.') }}</span>

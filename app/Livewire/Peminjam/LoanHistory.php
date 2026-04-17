@@ -47,24 +47,6 @@ class LoanHistory extends Component
             ->layout('layouts.app');
     }
 
-    public function requestReturn(int $loanId): void
-    {
-        $loan = Loan::where('id', $loanId)
-            ->where('user_id', auth()->id()) 
-            ->whereIn('status', ['ongoing', 'overdue'])     
-            ->firstOrFail();
-
-        $loan->update(['status' => 'awaiting_return']);
-
-        DB::table('activity_logs')->insert([
-            'user_id' => auth()->id(),
-            'action' => 'Mengajukan pengembalian alat (Peminjaman ID: #' . $loanId . ')',
-            'created_at' => now(),
-        ]);
-
-        session()->flash('message', 'Permintaan pengembalian berhasil dikirim. Menunggu konfirmasi Petugas.');
-    }
-
     // --- LOGIC MODAL ---
     public function openInfoModal($id)
     {

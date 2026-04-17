@@ -9,6 +9,9 @@ class Loan extends Model
 
     protected $fillable = ['user_id', 'approved_by', 'status', 'loan_date', 'return_date'];
 
+    // ─── Appends buat nambahin field virtual ───────────────────────
+    protected $appends = ['nominal_denda'];
+
     // ─── Status Constants ──────────────────────────────────────────
     const STATUS_PENDING          = 'pending';
     const STATUS_APPROVED         = 'approved';
@@ -63,5 +66,29 @@ class Loan extends Model
     public function return()
     {
         return $this->hasOne(ReturnModel::class);
+    }
+
+    // ─── Accessor Hitung Denda Per Jam ─────────────────────────────
+    public function getNominalDendaAttribute()
+    {
+        // Kalau status belum overdue, berarti denda 0
+        if ($this->status !== self::STATUS_OVERDUE || !$this->return_date) {
+            return 0;
+        }
+
+        $returnDate = \Carbon\Carbon::parse($this->return_date);
+        $now = \Carbon\Carbon::now();
+
+        // Cari selisih dalam hitungan menit biar presisi
+        $selisihMenit = $returnDate->diffInMinutes($now);
+
+        // Pakai ceil() buat pembulatan ke atas. 
+        // Contoh: Telat 15 menit -> 15/60 = 0.25 -> dibulatkan ke atas jadi 1 jam.
+        // Telat 65 menit -> 65/60 = 1.08 -> dibulatkan ke atas jadi 2 jam.
+        $jamTelat = ceil($selisihMenit / 60);
+
+        $tarifDendaPerJam = 2000; // Ganti sesuai tarif sekolah/sistem lo (misal Rp 2.000)
+
+        return $jamTelat * $tarifDendaPerJam;
     }
 }

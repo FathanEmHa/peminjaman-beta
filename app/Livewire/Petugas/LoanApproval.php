@@ -139,17 +139,10 @@ class LoanApproval extends Component
         $this->confirmingReturnId = $loanId;
         $this->conditionNotes = '';
         $this->damageFee = 0;
-        $this->calculatedLateFee = 0;
-
-        if ($this->selectedLoan->return_date) {
-            $expectedReturnDate = \Carbon\Carbon::parse($this->selectedLoan->return_date)->startOfDay();
-            $today = now()->startOfDay();
-
-            if ($today->greaterThan($expectedReturnDate)) {
-                $diffInDays = $today->diffInDays($expectedReturnDate);
-                $this->calculatedLateFee = $diffInDays * 5000;
-            }
-        }
+        
+        // Cukup panggil accessor nominal_denda yang udah lo buat di Model Loan.
+        // Single Source of Truth! Nggak perlu ngitung ulang di sini.
+        $this->calculatedLateFee = $this->selectedLoan->nominal_denda; 
         
         $this->showReturnModal = true;
     }
@@ -171,8 +164,9 @@ class LoanApproval extends Component
             'damageFee' => 'nullable|numeric|min:0',
         ]);
 
+        // UBAH VALIDASI STATUS DI SINI
         $loan = Loan::where('id', $this->confirmingReturnId)
-            ->whereIn('status', ['awaiting_return', 'overdue'])
+            ->whereIn('status', ['ongoing', 'overdue'])
             ->firstOrFail();
 
         DB::transaction(function () use ($loan) {
@@ -188,7 +182,7 @@ class LoanApproval extends Component
                 'returned_by' => $loan->user_id,
                 'received_by' => auth()->id(),
                 'return_date' => now()->toDateString(),
-                'condition_notes' => $this->conditionNotes ?: 'Dikembalikan dalam kondisi baik',
+                'condition_notes' => $this->conditionNotes ?: 'Dikembalikan dalam kondisi baik', // Ganti ke 'notes'
                 'late_fee' => $late,
                 'damage_fee' => $damage,
                 'fine_status' => $fineStatus,
