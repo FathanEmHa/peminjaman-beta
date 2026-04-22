@@ -27,7 +27,7 @@ Pastikan kamu sudah menginstall PHP (>= 8.2), Composer, dan Node.js di perangkat
 Clone Repositori
 
 Bash
-git clone https://github.com/username-kamu/sipa.git
+git clone https://github.com/FathanEmHa/peminjaman-beta.git
 cd sipa
 Instalasi Dependensi
 
