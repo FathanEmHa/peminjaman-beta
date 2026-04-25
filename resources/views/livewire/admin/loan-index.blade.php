@@ -1,16 +1,20 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-100 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            {{-- Ikon Peminjaman --}}
+            <div class="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
             </div>
-            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                Kelola Data Peminjaman
-            </h2>
+            
+            {{-- Teks Header --}}
+            <div>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    Kelola Data Peminjaman
+                </h2>
+                <p class="text-sm font-medium text-gray-500 mt-0.5">Pantau status, setujui, dan rekam peminjaman alat</p>
+            </div>
         </div>
     </x-slot>
 
@@ -91,7 +95,6 @@
                                 <option value="pending">Pending</option>
                                 <option value="approved">Approved</option>
                                 <option value="ongoing">Ongoing</option>
-                                <option value="awaiting_return">Awaiting Return</option>
                                 <option value="returned">Returned</option>
                                 <option value="rejected">Rejected</option>
                                 <option value="overdue">Overdue</option>
@@ -266,7 +269,8 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto relative min-h-[200px]">
+                <x-loading-overlay wire:loading wire:target="search" message="Mencari data..." />
                 <table class="w-full text-left whitespace-nowrap text-sm">
                     <thead>
                         <tr
@@ -275,7 +279,6 @@
                             <th class="px-6 py-4">Peminjam</th>
                             <th class="px-6 py-4">Alat (Qty)</th>
                             <th class="px-6 py-4">Timeline</th>
-                            <th class="px-6 py-4">Penyetuju</th>
                             <th class="px-6 py-4 text-center">Status</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -317,59 +320,27 @@
                                         {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y, H:i') }}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-gray-600">
-                                    {{ $loan->approver?->name ?? '—' }}
-                                </td>
                                 <td class="px-6 py-4 text-center">
-                                    @php
-                                        $badges = [
-                                            'pending' => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                            'approved' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                            'ongoing' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
-                                            'awaiting_return' => 'bg-orange-100 text-orange-700 border-orange-200',
-                                            'returned' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                            'rejected' => 'bg-red-100 text-red-700 border-red-200',
-                                            'overdue' => 'bg-rose-100 text-rose-700 border-rose-200',
-                                        ];
-                                        $labels = [
-                                            'pending' => 'Pending',
-                                            'approved' => 'Approved',
-                                            'ongoing' => 'Ongoing',
-                                            'awaiting_return' => 'Menunggu Konfirmasi',
-                                            'returned' => 'Returned',
-                                            'rejected' => 'Rejected',
-                                            'overdue' => 'OVERDUE',
-                                        ];
-                                        
-                                        $badgeClass = $badges[$loan->status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
-                                        $labelText = $labels[$loan->status] ?? $loan->status;
-                                        
-                                        $estLateFee = 0;
-                                        if ($loan->status === 'overdue' && $loan->return_date) {
-                                            $expectedReturnDate = \Carbon\Carbon::parse($loan->return_date);
-                                            $now = now();
-                                            if ($now->greaterThan($expectedReturnDate)) {
-                                                $diffInMinutes = $now->diffInMinutes($expectedReturnDate);
-                                                $diffInDays = ceil($diffInMinutes / 1440) ?: 1;
-                                                $estLateFee = $diffInDays * 5000;
-                                            }
-                                        }
-                                    @endphp
-
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $badgeClass }} uppercase tracking-wide">
-                                        {{ $labelText }}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border {{ $loan->status_badge_class }} uppercase tracking-wider">
+                                        {{ $loan->status_label }}
                                     </span>
-
-                                    @if($loan->status === 'overdue')
-                                        <div class="mt-2 flex flex-col items-center">
-                                            <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
-                                                Denda: Rp {{ number_format($estLateFee, 0, ',', '.') }}
-                                            </span>
-                                        </div>
-                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2">
+                                        
+                                        {{-- Tombol Detail / Kelola --}}
+                                        @if(in_array($loan->status, ['ongoing', 'overdue', 'returned']))
+                                            {{-- Admin diarahkan ke Return Management kalo butuh action return/fine --}}
+                                            <a href="{{ route('admin.returns', ['search' => $loan->id]) }}" wire:navigate class="inline-flex items-center justify-center p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors" title="Kelola Pengembalian/Denda">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </a>
+                                        @else
+                                            {{-- Kalo masih pending/approved, modalin approve/reject langsung juga boleh, atau arahin aja ke Petugas Approval kalo itu flow-nya --}}
+                                        @endif
+
                                         <button wire:click="edit({{ $loan->id }})"
                                             class="inline-flex items-center justify-center p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors"
                                             title="Edit">

@@ -1,14 +1,24 @@
 <div>
     <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-100 rounded-lg">
-                <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
+        <div class="flex items-center gap-4">
+            {{-- Tombol Kembali (Back) --}}
+            <a href="{{ route('petugas.approval') }}" wire:navigate class="p-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition text-gray-500" title="Kembali ke Kelola Peminjaman">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            </a>
+
+            {{-- Divider tipis --}}
+            <div class="h-6 w-px bg-gray-300 rounded"></div>
+
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                    <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                </div>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    Cetak Laporan Peminjaman
+                </h2>
             </div>
-            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                Cetak Laporan Peminjaman
-            </h2>
         </div>
     </x-slot>
 

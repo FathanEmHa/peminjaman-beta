@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Loan extends Model
 {
 
-    protected $fillable = ['user_id', 'approved_by', 'status', 'loan_date', 'return_date'];
+    protected $fillable = ['user_id', 'approved_by', 'status', 'loan_date', 'return_date', 'photo_before', 'photo_after'];
 
     // ─── Appends buat nambahin field virtual ───────────────────────
     protected $appends = ['nominal_denda'];
@@ -90,5 +90,74 @@ class Loan extends Model
         $tarifDendaPerJam = 2000; // Ganti sesuai tarif sekolah/sistem lo (misal Rp 2.000)
 
         return $jamTelat * $tarifDendaPerJam;
+    }
+
+    /**
+     * Get CSS classes for the status badge.
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        $status = $this->status;
+
+        $badges = [
+            'pending'   => 'bg-yellow-100 text-yellow-700 border-yellow-200',
+            'approved'  => 'bg-blue-100 text-blue-700 border-blue-200',
+            'ongoing'   => 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            'overdue'   => 'bg-rose-100 text-rose-700 border-rose-200',
+            'rejected'  => 'bg-red-100 text-red-700 border-red-200',
+            'cancelled' => 'bg-gray-100 text-gray-700 border-gray-200',
+        ];
+
+        // Jika statusnya bukan returned, langsung kembalikan warna dari array
+        if ($status !== 'returned') {
+            return $badges[$status] ?? 'bg-gray-100 text-gray-700 border-gray-200';
+        }
+
+        // --- LOGIC KHUSUS RETURNED ---
+        if (!$this->return) {
+            return 'bg-emerald-100 text-emerald-700 border-emerald-200'; // Default Hijau
+        }
+
+        $totalFine = ($this->return->late_fee ?? 0) + ($this->return->damage_fee ?? 0);
+
+        if ($totalFine > 0) {
+            return $this->return->fine_status === 'paid'
+                ? 'bg-amber-100 text-amber-700 border-amber-200' // Ada Denda, Lunas (Orange)
+                : 'bg-rose-100 text-rose-700 border-rose-200';   // Ada Denda, Nunggak (Merah)
+        }
+
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200'; // Bersih tanpa denda (Hijau)
+    }
+
+    /**
+     * Get human-readable label for the status badge.
+     */
+    public function getStatusLabelAttribute()
+    {
+        $status = strtoupper($this->status);
+
+        if ($this->status === 'returned' && $this->return) {
+            $totalFine = ($this->return->late_fee ?? 0) + ($this->return->damage_fee ?? 0);
+            
+            if ($totalFine > 0) {
+                return $this->return->fine_status === 'paid' ? 'RETURNED' : 'RETURNED'; 
+                // Opsional: Kalau mau teksnya beda, misal 'RETURNED (LUNAS)', ubah di baris atas ini
+            }
+        }
+
+        return $status;
+    }
+
+    /**
+     * Cek apakah peminjaman ini memiliki denda yang belum atau sudah dibayar.
+     */
+    public function getHasFineAttribute()
+    {
+        if ($this->status !== 'returned' || !$this->return) {
+            return false;
+        }
+        
+        $totalFine = ($this->return->late_fee ?? 0) + ($this->return->damage_fee ?? 0);
+        return $totalFine > 0;
     }
 }

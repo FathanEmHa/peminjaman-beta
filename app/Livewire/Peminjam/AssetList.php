@@ -14,6 +14,11 @@ class AssetList extends Component
     public $search = '';
     public $category_id = '';
 
+    // State buat Lightbox (Zoom Foto)
+    public $showImageModal = false;
+    public $activeImageUrl = '';
+    public $activeImageTitle = '';
+
     // Reset pagination ketika user mengetik pencarian atau mengubah filter
     public function updatingSearch()
     {
@@ -23,6 +28,21 @@ class AssetList extends Component
     public function updatingCategoryId()
     {
         $this->resetPage();
+    }
+
+    // Fungsi buat buka foto full
+    public function viewImage($url, $title)
+    {
+        $this->activeImageUrl = $url;
+        $this->activeImageTitle = $title;
+        $this->showImageModal = true;
+    }
+
+    // Fungsi buat tutup modal foto
+    public function closeImageModal()
+    {
+        $this->showImageModal = false;
+        $this->activeImageUrl = '';
     }
 
     public function render()
@@ -39,7 +59,6 @@ class AssetList extends Component
 
         $categories = Category::all();
 
-        // Tambahkan ->layout('layouts.app') di baris ini
         return view('livewire.peminjam.asset-list', [
             'assets' => $assets,
             'categories' => $categories,

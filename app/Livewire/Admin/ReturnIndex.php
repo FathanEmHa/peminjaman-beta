@@ -7,6 +7,7 @@ use App\Models\ReturnModel;
 use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 
 class ReturnIndex extends Component
 {
@@ -23,6 +24,7 @@ class ReturnIndex extends Component
     public string $conditionNotes = '';
 
     // ─── Search ────────────────────────────────────────────────────
+    #[Url]
     public string $search = '';
 
     public function render()
@@ -49,9 +51,9 @@ class ReturnIndex extends Component
             ->latest()
             ->get();
 
-        // Loan yang bisa dibuatkan record pengembalian manual (awaiting_return atau ongoing)
+        // Loan yang bisa dibuatkan record pengembalian manual (ongoing atau overdue)
         $eligibleLoans = Loan::with('user')
-            ->whereIn('status', ['awaiting_return', 'ongoing'])
+            ->whereIn('status', ['ongoing', 'overdue'])
             ->whereDoesntHave('return') // Belum punya record pengembalian
             ->orderBy('id')
             ->get();
@@ -90,10 +92,6 @@ class ReturnIndex extends Component
 
     // ─── CRUD Operations ───────────────────────────────────────────
 
-    /**
-     * Buat record pengembalian secara manual (Admin override).
-     * Mengubah status loan menjadi 'returned' dan mengembalikan stok.
-     */
     public function store(): void
     {
         $this->validate([
@@ -112,13 +110,25 @@ class ReturnIndex extends Component
         }
 
         DB::transaction(function () use ($loan) {
+            // Hitung keterlambatan (Jika Admin entry manual, default kita asumsikan gada denda, cuma lewat form petugas yg ada modalnya. Klo admin mau nambahin, dia bisa edit datanya atau pake modal petugas)
+            $lateFee = 0;
+            $expected = \Carbon\Carbon::parse($loan->return_date)->startOfDay();
+            $actual = \Carbon\Carbon::parse($this->returnDate)->startOfDay();
+            
+            if ($actual->greaterThan($expected)) {
+                $lateFee = $actual->diffInDays($expected) * 5000;
+            }
+
             // Buat record di tabel returns
             ReturnModel::create([
                 'loan_id' => $loan->id,
                 'returned_by' => $loan->user_id,
                 'received_by' => $this->receivedBy,
                 'return_date' => $this->returnDate,
-                'condition_notes' => $this->conditionNotes ?: 'Dikembalikan dalam kondisi baik',
+                'condition_notes' => $this->conditionNotes ?: 'Dikembalikan dalam kondisi baik (Entry Admin)',
+                'late_fee' => $lateFee,
+                'damage_fee' => 0,
+                'fine_status' => $lateFee > 0 ? 'unpaid' : 'none',
             ]);
 
             // Update status loan
@@ -140,9 +150,6 @@ class ReturnIndex extends Component
         session()->flash('message', 'Record pengembalian berhasil dibuat. Stok alat telah diperbarui.');
     }
 
-    /**
-     * Load data pengembalian ke form untuk diedit.
-     */
     public function edit(int $id): void
     {
         $record = ReturnModel::findOrFail($id);
@@ -158,10 +165,6 @@ class ReturnIndex extends Component
         $this->showForm = true;
     }
 
-    /**
-     * Update data pengembalian (tanggal, catatan, penerima).
-     * Tidak mengubah stok — hanya koreksi data.
-     */
     public function update(): void
     {
         $this->validate([
@@ -187,10 +190,6 @@ class ReturnIndex extends Component
         session()->flash('message', 'Data pengembalian berhasil diperbarui.');
     }
 
-    /**
-     * Hapus record pengembalian.
-     * Mengembalikan status loan ke 'awaiting_return' agar bisa diproses kembali.
-     */
     public function delete(int $id): void
     {
         $record = ReturnModel::with('loan.items.asset')->findOrFail($id);
@@ -202,18 +201,22 @@ class ReturnIndex extends Component
                 $item->asset->decrement('stock', $item->quantity);
             }
 
-            // Kembalikan status loan ke awaiting_return (agar bisa diproses ulang)
-            $loan->update(['status' => 'awaiting_return']);
+            // Cek apakah masih telat atau nggak berdasarkan loan_date dan return_date asli
+            $now = now();
+            $expected = \Carbon\Carbon::parse($loan->return_date);
+            $newStatus = $now->greaterThan($expected) ? 'overdue' : 'ongoing';
+
+            $loan->update(['status' => $newStatus]);
 
             DB::table('activity_logs')->insert([
                 'user_id' => auth()->id(),
-                'action' => 'Admin menghapus record pengembalian (Peminjaman ID: #' . $loan->id . '). Status dikembalikan ke awaiting_return.',
+                'action' => 'Admin menghapus record pengembalian (Peminjaman ID: #' . $loan->id . '). Status dikembalikan ke ' . $newStatus . '.',
                 'created_at' => now(),
             ]);
 
             $record->delete();
         });
 
-        session()->flash('message', 'Record pengembalian dihapus. Status peminjaman dikembalikan ke "Menunggu Konfirmasi".');
+        session()->flash('message', 'Record pengembalian dihapus. Status peminjaman dikembalikan.');
     }
 }

@@ -1,14 +1,20 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-100 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            {{-- Ikon Log Aktivitas --}}
+            <div class="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                Log Aktivitas Sistem
-            </h2>
+            
+            {{-- Teks Header --}}
+            <div>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    Log Aktivitas Sistem
+                </h2>
+                <p class="text-sm font-medium text-gray-500 mt-0.5">Rekam jejak seluruh perubahan dan akses pengguna</p>
+            </div>
         </div>
     </x-slot>
 

@@ -14,6 +14,11 @@ class AssetKatalog extends Component
     public $search = '';
     public $category_id = '';
 
+    // --- State untuk Modal Foto (Lightbox) ---
+    public $showImageModal = false;
+    public $activeImageUrl = '';
+    public $activeImageTitle = '';
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -22,6 +27,20 @@ class AssetKatalog extends Component
     public function updatingCategoryId()
     {
         $this->resetPage();
+    }
+
+    // --- Fungsi Buka/Tutup Modal Foto ---
+    public function viewImage($url, $title)
+    {
+        $this->activeImageUrl = $url;
+        $this->activeImageTitle = $title;
+        $this->showImageModal = true;
+    }
+
+    public function closeImageModal()
+    {
+        $this->showImageModal = false;
+        $this->activeImageUrl = '';
     }
 
     public function render()

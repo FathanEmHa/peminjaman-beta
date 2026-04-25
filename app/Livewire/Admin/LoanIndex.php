@@ -25,8 +25,8 @@ class LoanIndex extends Component
     public string $returnDate = '';
 
     // ─── Item Cart (untuk Create) ──────────────────────────────────
-    public ?int $selectedAsset = null;
-    public int $quantity = 1;
+    public $selectedAsset = null; // Hapus ?int
+    public $quantity = 1;         // Hapus int
     public array $cart = [];
 
     // ─── Search & Filter ───────────────────────────────────────────
@@ -34,7 +34,7 @@ class LoanIndex extends Component
 
     public function render()
     {
-        $loans = Loan::with(['items.asset', 'user', 'approver'])
+        $loans = Loan::with(['items.asset', 'user', 'approver', 'return'])
             ->when(
                 $this->search,
                 fn($q) =>
@@ -71,15 +71,14 @@ class LoanIndex extends Component
         $this->reset([
             'userId',
             'approvedBy',
-            'status',
             'loanDate',
             'returnDate',
             'selectedAsset',
-            'quantity',
             'cart',
             'editId',
             'isEdit',
-        ]);
+        ]); // Hapus 'status' dan 'quantity' dari array reset ini
+
         $this->status = 'pending';
         $this->quantity = 1;
         $this->showForm = false;
@@ -89,33 +88,42 @@ class LoanIndex extends Component
 
     public function addToCart(): void
     {
+        // 1. Validasi Input (Ubah quantity jadi numeric biar nerima string angka dari input)
         $this->validate([
             'selectedAsset' => 'required|exists:assets,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity'      => 'required|numeric|min:1',
+        ], [
+            'selectedAsset.required' => 'Silakan pilih alat terlebih dahulu.',
+            'selectedAsset.exists'   => 'Alat yang dipilih tidak valid.',
+            'quantity.required'      => 'Jumlah harus diisi.',
+            'quantity.min'           => 'Minimal peminjaman adalah 1 alat.',
         ]);
 
         $asset = Asset::findOrFail($this->selectedAsset);
 
+        // 2. Validasi Stok
         if ($this->quantity > $asset->stock) {
-            $this->addError('quantity', "Stok tidak mencukupi. Stok tersedia: {$asset->stock}");
+            $this->addError('quantity', "Stok tidak mencukupi! Sisa stok: {$asset->stock}");
             return;
         }
 
-        // Cek duplikat di cart
+        // 3. Validasi Duplikat di Cart
         foreach ($this->cart as $item) {
-            if ($item['asset_id'] === $asset->id) {
-                $this->addError('selectedAsset', 'Alat ini sudah ada di daftar.');
+            if ($item['asset_id'] == $asset->id) {
+                $this->addError('selectedAsset', 'Alat ini sudah ada di keranjang.');
                 return;
             }
         }
 
+        // 4. Masukkan ke array Cart
         $this->cart[] = [
             'asset_id' => $asset->id,
-            'name' => $asset->name,
-            'quantity' => $this->quantity,
+            'name'     => $asset->name,
+            'quantity' => (int) $this->quantity, // Casting ke int biar datanya bersih
         ];
 
-        $this->reset(['selectedAsset', 'quantity']);
+        // 5. Reset Field (Jangan masukin quantity ke reset biar nggak jadi null)
+        $this->reset('selectedAsset');
         $this->quantity = 1;
     }
 
@@ -131,7 +139,7 @@ class LoanIndex extends Component
     {
         $this->validate([
             'userId' => 'required|exists:users,id',
-            'status' => 'required|in:pending,approved,ongoing,awaiting_return,returned,rejected',
+            'status' => 'required|in:pending,approved,ongoing,awaiting_return,returned,rejected,overdue',
             'loanDate' => 'required|date',
             'returnDate' => 'required|date|after_or_equal:loanDate',
             'cart' => 'required|array|min:1',
@@ -201,7 +209,7 @@ class LoanIndex extends Component
     {
         $this->validate([
             'userId' => 'required|exists:users,id',
-            'status' => 'required|in:pending,approved,ongoing,awaiting_return,returned,rejected',
+            'status' => 'required|in:pending,approved,ongoing,awaiting_return,returned,rejected,overdue',
             'loanDate' => 'required|date',
             'returnDate' => 'required|date|after_or_equal:loanDate',
         ]);

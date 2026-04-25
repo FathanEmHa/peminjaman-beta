@@ -35,10 +35,16 @@
         @endif
 
         @if(auth()->user()->role === 'petugas')
-            <a href="{{ route('petugas.katalog') }}" target="_blank" wire:navigate.hover
-                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition text-gray-300">Katalog
+            <a href="{{ route('petugas.katalog') }}" wire:navigate.hover
+                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('petugas.katalog') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">Katalog
                 Assets</a>
+            <div class="pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Transaksi</div>
+            <a href="{{ route('petugas.approval') }}" wire:navigate.hover
+                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('petugas.approval') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">Kelola Peminjaman</a>
+            <a href="{{ route('petugas.returns') }}" wire:navigate.hover
+                class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('petugas.returns') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">Kelola Pengembalian</a>
         @endif
+
 
         @if(auth()->user()->role === 'peminjam')
             <a href="{{ route('peminjam.katalog') }}" wire:navigate.hover

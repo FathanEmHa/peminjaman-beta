@@ -1,14 +1,20 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-100 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            {{-- Ikon Pengembalian --}}
+            <div class="p-2.5 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                 </svg>
             </div>
-            <h2 class="font-bold text-2xl text-gray-800 leading-tight">
-                Kelola Data Pengembalian
-            </h2>
+            
+            {{-- Teks Header --}}
+            <div>
+                <h2 class="font-bold text-2xl text-gray-800 leading-tight">
+                    Kelola Data Pengembalian
+                </h2>
+                <p class="text-sm font-medium text-gray-500 mt-0.5">Catat penerimaan alat dan kelola status denda</p>
+            </div>
         </div>
     </x-slot>
 
@@ -21,6 +27,14 @@
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
                 <span class="font-medium text-sm">{{ session('message') }}</span>
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium text-sm">{{ session('error') }}</span>
             </div>
         @endif
 
@@ -67,7 +81,7 @@
                         @if(count($eligibleLoans) === 0)
                             <div class="flex gap-2 p-3 mt-3 bg-amber-50 rounded-lg border border-amber-100 text-amber-700 text-xs">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                <p>Tidak ada peminjaman aktif yang butuh pengembalian. Pastikan status peminjaman adalah <strong>Ongoing</strong> atau <strong>Menunggu Konfirmasi</strong>.</p>
+                                <p>Tidak ada peminjaman aktif yang butuh pengembalian. Pastikan status peminjaman adalah <strong>Ongoing</strong> atau <strong>Overdue</strong>.</p>
                             </div>
                         @endif
                     </div>
@@ -119,7 +133,7 @@
                     @else
                     <div class="flex gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100 text-amber-700 text-xs">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        <p>Edit hanya mengubah data catatan. Stok alat dan status peminjaman tidak akan berubah ganda.</p>
+                        <p>Edit hanya mengubah data catatan & tanggal. Stok alat dan status peminjaman tidak akan berubah ganda.</p>
                     </div>
                     @endif
                 </div>
@@ -154,26 +168,27 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         </div>
-                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari peminjam..." class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari peminjam atau ID..." class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                     </div>
                     @if(!$showForm)
                     <button wire:click="openCreateForm" class="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        Manual
+                        Manual Entry
                     </button>
                     @endif
                 </div>
             </div>
 
             <div class="overflow-x-auto">
+                <x-loading-overlay wire:loading wire:target="search" message="Mencari data..." />
                 <table class="w-full text-left whitespace-nowrap text-sm">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-xs font-semibold">
-                            <th class="px-6 py-4 w-16">ID</th>
+                            <th class="px-6 py-4 w-16">ID Ret</th>
                             <th class="px-6 py-4">Peminjam & Alat</th>
                             <th class="px-6 py-4">Tgl Kembali</th>
+                            <th class="px-6 py-4">Status Loan</th>
                             <th class="px-6 py-4">Diterima Oleh</th>
-                            <th class="px-6 py-4">Catatan</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -191,18 +206,15 @@
                                 {{ \Carbon\Carbon::parse($record->return_date)->format('d M Y') }}
                             </td>
                             <td class="px-6 py-4">
+                                {{-- GANTI PAKE ACCESSOR --}}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border {{ $record->loan->status_badge_class }} uppercase tracking-wider">
+                                    {{ $record->loan->status_label }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
                                 <span class="text-gray-900">{{ $record->receivedByUser?->name ?? '—' }}</span>
                                 @if($record->receivedByUser)
                                     <span class="block text-xs text-gray-500">{{ ucfirst($record->receivedByUser->role) }}</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($record->condition_notes)
-                                    <span class="inline-block truncate max-w-[150px] text-gray-600" title="{{ $record->condition_notes }}">
-                                        {{ $record->condition_notes }}
-                                    </span>
-                                @else
-                                    <span class="text-gray-400 italic text-xs">Tidak ada catatan</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
@@ -221,7 +233,7 @@
                             <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="p-4 bg-gray-50 rounded-full mb-3">
-                                        <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                                        <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
                                     </div>
                                     <p class="text-gray-500 text-sm">
                                         @if($search) Tidak ditemukan data untuk "<strong>{{ $search }}</strong>". @else Belum ada riwayat pengembalian. @endif
