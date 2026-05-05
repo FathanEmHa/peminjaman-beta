@@ -81,14 +81,14 @@
         </div>
 
         {{-- ── Child: Tabel ────────────────────────────────────────── --}}
-        @livewire('petugas.approval-table', [
+        @livewire('petugas.loans.approval-table', [
             'search'       => $search,
             'searchAlat'   => $searchAlat,
             'statusFilter' => $statusFilter,
         ])
 
         {{-- ── Child: Modal Aksi (always mounted, show dikontrol internal) ── --}}
-        @livewire('petugas.approval-action-modal')
+        @livewire('petugas.loans.approval-action-modal')
 
     </div>
 </div>

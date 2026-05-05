@@ -46,14 +46,14 @@
             - store(), update(), resetFields()
             - Dispatch 'loan-saved', 'loan-edit-opened', 'loan-form-closed'
         --}}
-        @livewire('admin.loan-form')
+        @livewire('admin.loans.form')
 
         {{-- ── Child: Data Table ───────────────────────────────────── --}}
         {{--
             LoanTable menerima $search sebagai reactive prop.
             Setiap kali parent update $search, child otomatis re-render.
         --}}
-        @livewire('admin.loan-table', ['search' => $search])
+        @livewire('admin.loans.table', ['search' => $search])
 
     </div>
 </div>

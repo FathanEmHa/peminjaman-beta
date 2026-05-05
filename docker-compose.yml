@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sipa-app
+    container_name: sipa-app
+    restart: unless-stopped
+    ports:
+      - "8000:80" # Akses dari laptop lu (port 8000) diarahkan ke port 80 di container
+    volumes:
+      - .:/var/www/html # Sinkronisasi folder lokal lu ke dalam container (Live Reload)
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: sipa-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: beta_db
+      MYSQL_ROOT_PASSWORD: tatan  # (Ini buat password akun root)
+      MYSQL_USER: tatan           # (Ini WAJIB ditambahin biar user 'tatan' kebuat)
+      MYSQL_PASSWORD: 2613
+    ports:
+      - "3307:3306"
+    volumes:
+      - sipa-mysql-data:/var/lib/mysql # Biar data DB gak hilang pas container dimatiin
+
+volumes:
+  sipa-mysql-data:

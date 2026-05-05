@@ -56,7 +56,7 @@
             - store(), update(), resetFields()
             - Setelah berhasil, dispatch('return-saved', ['message' => '...'])
         --}}
-        @livewire('admin.return-form')
+        @livewire('admin.returns.form')
 
         {{-- ── Child: Tabel + Search + Pagination ─────────────────── --}}
         {{--
@@ -65,7 +65,7 @@
             Di sini kita pakai reactive property: parent yang pegang $search,
             child menerimanya sebagai @prop.
         --}}
-        @livewire('admin.return-table', ['search' => $search])
+        @livewire('admin.returns.table', ['search' => $search])
 
     </div>
 </div>

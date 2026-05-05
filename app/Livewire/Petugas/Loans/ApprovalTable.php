@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Livewire\Petugas;
+namespace App\Livewire\Petugas\Loans;
 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Reactive;
 use App\Models\Loan;
 
 /**
@@ -25,8 +26,13 @@ class ApprovalTable extends Component
     use WithPagination;
 
     // ─── Reactive Props dari Parent ────────────────────────────────
+    #[Reactive]
     public string $search       = '';
+
+    #[Reactive]
     public string $searchAlat   = '';
+
+    #[Reactive]
     public string $statusFilter = '';
 
     // ─── Reset page saat filter berubah ────────────────────────────
@@ -62,6 +68,6 @@ class ApprovalTable extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.petugas.approval-table', compact('loans'));
+        return view('livewire.petugas.loans.approval-table', compact('loans'));
     }
 }

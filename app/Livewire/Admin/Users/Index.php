@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Users;
 
 use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class UserIndex extends Component
+class Index extends Component
 {
     public $name, $email, $password, $role;
     public $userId;
@@ -15,7 +15,7 @@ class UserIndex extends Component
     public function render()
     {
         $users = User::latest()->get();
-        return view('livewire.admin.user-index', compact('users'))
+        return view('livewire.admin.users.index', compact('users'))
             ->layout('layouts.app');
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Petugas;
+namespace App\Livewire\Petugas\Returns;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -9,7 +9,7 @@ use Livewire\Attributes\Url;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 
-class ReturnManagement extends Component
+class Management extends Component
 {
     use WithPagination, WithFileUploads;
 
@@ -61,7 +61,7 @@ class ReturnManagement extends Component
             ->latest()
             ->paginate(10);
 
-        return view('livewire.petugas.return-management', compact('loans'))
+        return view('livewire.petugas.returns.management', compact('loans'))
             ->layout('layouts.app');
     }
 

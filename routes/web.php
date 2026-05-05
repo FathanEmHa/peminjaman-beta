@@ -24,12 +24,12 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
-        Route::get('/categories', \App\Livewire\Admin\CategoryIndex::class)->name('admin.categories');
-        Route::get('/assets', \App\Livewire\Admin\AssetIndex::class)->name('admin.assets');
-        Route::get('/users', \App\Livewire\Admin\UserIndex::class)->name('admin.users');
+        Route::get('/categories', \App\Livewire\Admin\Categories\Index::class)->name('admin.categories');
+        Route::get('/assets', \App\Livewire\Admin\Assets\Index::class)->name('admin.assets');
+        Route::get('/users', \App\Livewire\Admin\Users\Index::class)->name('admin.users');
         Route::get('/activity-logs', \App\Livewire\Admin\ActivityLog::class)->name('admin.logs');
-        Route::get('/loans', \App\Livewire\Admin\LoanIndex::class)->name('admin.loans');
-        Route::get('/returns', \App\Livewire\Admin\ReturnIndex::class)->name('admin.returns');
+        Route::get('/loans', \App\Livewire\Admin\Loans\Index::class)->name('admin.loans');
+        Route::get('/returns', \App\Livewire\Admin\Returns\Index::class)->name('admin.returns');
 
     });
 
@@ -37,21 +37,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:petugas'])->prefix('petugas')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'petugas'])->name('petugas.dashboard');
-
-        // Pastikan ada ->name('petugas.dashboard') di ujungnya
-        Route::get('/approval', \App\Livewire\Petugas\LoanApproval::class)->name('petugas.approval');
-
-        Route::get('/returns', \App\Livewire\Petugas\ReturnManagement::class)->name('petugas.returns');
-
-        // TAMBAHKAN ROUTE KATALOG PETUGAS DI SINI
-        Route::get('/katalog-aset', \App\Livewire\Petugas\AssetKatalog::class)->name('petugas.katalog');
-
-        // === TAMBAHIN BARIS INI BIAR GAK NGACO ===
-        Route::get('/laporan', \App\Livewire\Petugas\ReportFilter::class)->name('petugas.laporan');
-
-        // Route cetak laporan (yang proses filternya)
+        Route::get('/approval', \App\Livewire\Petugas\Loans\Approval::class)->name('petugas.approval');
+        Route::get('/returns', \App\Livewire\Petugas\Returns\Management::class)->name('petugas.returns');
+        Route::get('/katalog-aset', \App\Livewire\Petugas\Reports\AssetKatalog::class)->name('petugas.katalog');
+        Route::get('/laporan', \App\Livewire\Petugas\Reports\Filter::class)->name('petugas.laporan');
         Route::get('/laporan/cetak', [\App\Http\Controllers\Petugas\ReportController::class, 'print'])->name('petugas.laporan.cetak');
-
         Route::get('/loans/{loan}/detail', \App\Livewire\Shared\LoanDetail::class)->name('petugas.loans.detail');
     });
 

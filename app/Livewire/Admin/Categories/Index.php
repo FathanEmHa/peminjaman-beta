@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Categories;
 
 use Livewire\Component;
 use App\Models\Category;
 
-class CategoryIndex extends Component
+class Index extends Component
 {
     public $name = '';
     public $categoryId = null;
@@ -14,7 +14,7 @@ class CategoryIndex extends Component
     public function render()
     {
         $categories = Category::latest()->get();
-        return view('livewire.admin.category-index', compact('categories'))
+        return view('livewire.admin.categories.index', compact('categories'))
             ->layout('layouts.app');
     }
 

@@ -18,6 +18,8 @@ class LoanHistory extends Component
     public $showModal = false;
     public $selectedLoan = null;
 
+    public $showRejectionModal = false;
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -26,6 +28,21 @@ class LoanHistory extends Component
     public function updatingStatusFilter()
     {
         $this->resetPage();
+    }
+
+    public function openRejectionModal($id)
+    {
+        $this->selectedLoan = Loan::findOrFail($id);
+        $this->showRejectionModal = true;
+    }
+
+    public function closeRejectionModal()
+    {
+        $this->showRejectionModal = false;
+        // Hanya kosongkan selectedLoan jika showModal (Denda) juga sedang false
+        if (!$this->showModal) {
+            $this->selectedLoan = null;
+        }
     }
 
     public function render()

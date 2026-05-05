@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Returns;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\DB;
  *  - Listen: 'return-form-closed' → clear highlight
  *  - Kirim:  dispatch('return-deleted') ke parent setelah delete sukses
  */
-class ReturnTable extends Component
+class Table extends Component
 {
     use WithPagination;
 
@@ -126,6 +126,6 @@ class ReturnTable extends Component
         ->latest()
         ->paginate(10);
 
-        return view('livewire.admin.return-table', compact('returnRecords'));
+        return view('livewire.admin.returns.table', compact('returnRecords'));
     }
 }

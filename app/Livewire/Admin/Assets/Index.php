@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Assets;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -8,7 +8,7 @@ use App\Models\Asset;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
-class AssetIndex extends Component
+class Index extends Component
 {
     use WithFileUploads;
 
@@ -52,7 +52,7 @@ class AssetIndex extends Component
         $assets = Asset::with('category')->latest()->get();
         $categories = Category::all();
 
-        return view('livewire.admin.asset-index', compact('assets', 'categories'))
+        return view('livewire.admin.assets.index', compact('assets', 'categories'))
             ->layout('layouts.app');
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Loans;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
  *  - Mengirim: dispatch('loan-deleted') ke parent setelah delete
  *  - Mengirim: dispatch('open-loan-edit', [id]) ke LoanForm
  */
-class LoanTable extends Component
+class Table extends Component
 {
     // ─── Reactive Prop dari Parent ─────────────────────────────────
     // Dideklarasikan public agar Livewire 3 bisa melewatkannya dari parent.
@@ -96,6 +96,6 @@ class LoanTable extends Component
             ->latest()
             ->get();
 
-        return view('livewire.admin.loan-table', compact('loans'));
+        return view('livewire.admin.loans.table', compact('loans'));
     }
 }

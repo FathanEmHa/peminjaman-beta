@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Loan extends Model
 {
 
-    protected $fillable = ['user_id', 'approved_by', 'status', 'loan_date', 'return_date', 'photo_before', 'photo_after'];
+    protected $fillable = ['user_id', 'approved_by', 'status', 'loan_date', 'return_date', 'photo_before', 'photo_after', 'rejection_note'];
 
     // ─── Appends buat nambahin field virtual ───────────────────────
     protected $appends = ['nominal_denda'];

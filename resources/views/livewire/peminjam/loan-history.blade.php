@@ -136,10 +136,25 @@
                                             Lihat Detail
                                         </a>
 
-                                        {{-- Aksi Utama --}}
+                                        {{-- Aksi Utama & Status Note --}}
                                         @if($loan->status == 'returned' && !$loan->has_fine)
                                             <span class="text-xs font-bold text-emerald-600">Selesai</span>
-                                        @elseif(in_array($loan->status, ['rejected', 'cancelled']))
+
+                                        {{-- JIKA DITOLAK (REJECTED) --}}
+                                        @elseif($loan->status === 'rejected')
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="text-gray-400 text-xs italic">Ditolak</span>
+                                                @if($loan->rejection_note)
+                                                    {{-- Tombol kecil buat nampilin tooltip/modal alasan --}}
+                                                    <button wire:click="openRejectionModal({{ $loan->id }})" 
+                                                        class="text-[10px] text-rose-500 hover:text-rose-700 underline font-medium cursor-pointer">
+                                                        Lihat Alasan
+                                                    </button>
+                                                @endif
+                                            </div>
+
+                                        {{-- JIKA DIBATALKAN SENDIRI --}}
+                                        @elseif($loan->status === 'cancelled')
                                             <span class="text-gray-400 text-xs italic">Dibatalkan</span>
                                         @endif
 
@@ -277,6 +292,46 @@
 
                     <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-center">
                         <button wire:click="closeModal" class="px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold rounded-lg transition-colors w-full">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+        @endif
+
+        {{-- MODAL ALASAN PENOLAKAN --}}
+        @if($showRejectionModal && $selectedLoan)
+        <template x-teleport="body">
+            <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm transition-opacity">
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform transition-all">
+                    
+                    {{-- Header Modal --}}
+                    <div class="bg-rose-600 px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-white font-bold text-lg">Alasan Penolakan</h3>
+                        <button wire:click="closeRejectionModal" class="text-rose-200 hover:text-white transition-colors">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Body Modal --}}
+                    <div class="p-6 bg-rose-50/30">
+                        <div class="text-center mb-4">
+                            <p class="text-sm text-gray-500">ID Transaksi</p>
+                            <p class="text-xl font-black text-gray-800">#{{ $selectedLoan->id }}</p>
+                        </div>
+
+                        <div class="p-4 bg-white border border-rose-100 rounded-xl shadow-sm">
+                            <p class="text-sm text-gray-700 italic text-center">
+                                "{{ $selectedLoan->rejection_note }}"
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-center">
+                        <button wire:click="closeRejectionModal" class="px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold rounded-lg transition-colors w-full">
                             Tutup
                         </button>
                     </div>

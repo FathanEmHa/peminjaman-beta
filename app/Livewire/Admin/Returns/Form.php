@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Returns;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -29,7 +29,7 @@ use Carbon\Carbon;
  *  - 'open-return-create' → dari tombol "Manual Entry" di ReturnTable
  *  - 'open-return-edit'   → dari tombol Edit di ReturnTable
  */
-class ReturnForm extends Component
+class Form extends Component
 {
     // ─── Visibility ────────────────────────────────────────────────
     public bool $showForm = false;
@@ -209,6 +209,6 @@ class ReturnForm extends Component
             ? User::whereIn('role', ['petugas', 'admin'])->orderBy('name')->get()
             : collect();
 
-        return view('livewire.admin.return-form', compact('eligibleLoans', 'staffUsers'));
+        return view('livewire.admin.returns.form', compact('eligibleLoans', 'staffUsers'));
     }
 }

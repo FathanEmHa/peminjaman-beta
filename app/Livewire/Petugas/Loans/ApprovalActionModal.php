@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Petugas;
+namespace App\Livewire\Petugas\Loans;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -132,6 +132,7 @@ class ApprovalActionModal extends Component
         $loan->update([
             'status'      => 'rejected',
             'approved_by' => auth()->id(),
+            'rejection_note' => $this->rejectionNote,
         ]);
 
         // Simpan catatan penolakan ke activity log (bisa juga ke kolom khusus jika ada)
@@ -223,6 +224,6 @@ class ApprovalActionModal extends Component
 
     public function render()
     {
-        return view('livewire.petugas.approval-action-modal');
+        return view('livewire.petugas.loans.approval-action-modal');
     }
 }

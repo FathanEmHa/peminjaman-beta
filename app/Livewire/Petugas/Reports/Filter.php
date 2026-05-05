@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire\Petugas;
+namespace App\Livewire\Petugas\Reports;
 
 use Livewire\Component;
 use App\Models\Asset;
 
-class ReportFilter extends Component
+class Filter extends Component
 {
     // Properti ini akan di-bind otomatis ke select dropdown
     public $period = '';
@@ -17,7 +17,7 @@ class ReportFilter extends Component
         // Ambil semua aset buat pilihan filter
         $assets = Asset::orderBy('name', 'asc')->get();
         
-        return view('livewire.petugas.report-filter', compact('assets'))
+        return view('livewire.petugas.reports.filter', compact('assets'))
             ->layout('layouts.app');
     }
 }

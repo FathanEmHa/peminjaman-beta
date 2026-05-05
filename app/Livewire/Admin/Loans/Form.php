@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Loans;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -24,7 +24,7 @@ use Carbon\Carbon;
  *  - Setelah sukses → dispatch('loan-saved') ke parent & sibling
  *  - Setelah tutup  → dispatch('loan-form-closed') ke LoanTable
  */
-class LoanForm extends Component
+class Form extends Component
 {
     // ─── Visibility ────────────────────────────────────────────────
     public bool $showForm = false;
@@ -284,6 +284,6 @@ class LoanForm extends Component
         $assets     = $this->showForm ? Asset::where('stock', '>', 0)->orderBy('name')->get()                        : collect();
         $staffUsers = $this->showForm ? User::whereIn('role', ['petugas', 'admin'])->orderBy('name')->get()          : collect();
 
-        return view('livewire.admin.loan-form', compact('users', 'assets', 'staffUsers'));
+        return view('livewire.admin.loans.form', compact('users', 'assets', 'staffUsers'));
     }
 }

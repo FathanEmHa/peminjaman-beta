@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin;
+namespace App\Livewire\Admin\Returns;
 
 use Livewire\Component;
 use Livewire\Attributes\Url;
@@ -17,7 +17,7 @@ use Livewire\Attributes\On;
  *
  * TIDAK mengandung: query DB, logika CRUD, form state, modal state.
  */
-class ReturnIndex extends Component
+class Index extends Component
 {
     // ─── Search State (shared ke ReturnTable via @entangle atau $this->dispatch) ─
     #[Url(as: 'q')]
@@ -61,7 +61,7 @@ class ReturnIndex extends Component
 
     public function render()
     {
-        return view('livewire.admin.return-index')
+        return view('livewire.admin.returns.index')
             ->layout('layouts.app');
     }
 }

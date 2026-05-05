@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Petugas;
+namespace App\Livewire\Petugas\Reports;
 
 use App\Models\Asset;
 use App\Models\Category;
@@ -56,7 +56,7 @@ class AssetKatalog extends Component
 
         $categories = Category::all();
 
-        return view('livewire.petugas.asset-katalog', [
+        return view('livewire.petugas.reports.asset-katalog', [
             'assets' => $assets,
             'categories' => $categories,
         ])->layout('layouts.app'); // Jangan lupa set layout
