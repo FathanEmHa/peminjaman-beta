@@ -76,12 +76,24 @@ class DashboardController extends Controller
 
     public function admin()
     {
+        // 1. Hitung denda yang sudah fix tapi belum dibayar (dari tabel returns)
+        $actualUnpaidFines = DB::table('returns')
+            ->where('fine_status', 'unpaid')
+            ->sum(DB::raw('late_fee + damage_fee'));
+
+        // 2. Hitung denda berjalan (estimasi) dari transaksi yang masih overdue
+        $overdueLoans = Loan::where('status', 'overdue')->get();
+        $estimatedFines = $overdueLoans->sum('nominal_denda'); // Manggil accessor dari Model
+
+        // 3. Gabungkan totalnya
+        $totalFines = $actualUnpaidFines + $estimatedFines;
+
         // Hitung statistik untuk 4 kartu di atas
         $stats = [
             'total_users'  => User::count(),
             'total_assets' => Asset::sum('stock'), // Total fisik barang
             'active_loans' => Loan::whereIn('status', ['ongoing', 'overdue'])->count(),
-            'unpaid_fines' => DB::table('returns')->where('fine_status', 'unpaid')->sum(DB::raw('late_fee + damage_fee')),
+            'unpaid_fines' => $totalFines, // <-- Masukin total gabungannya ke sini
         ];
 
         // Ambil 5 log aktivitas terbaru

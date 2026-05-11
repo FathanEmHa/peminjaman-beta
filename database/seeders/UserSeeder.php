@@ -2,45 +2,40 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed 3 akun utama untuk keperluan demo SIPA.
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@mail.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin'
-        ]);
+        $users = [
+            [
+                'name'     => 'Administrator',
+                'email'    => 'admin@mail.com',
+                'password' => Hash::make('password'),
+                'role'     => 'admin',
+            ],
+            [
+                'name'     => 'Budi Santoso',
+                'email'    => 'petugas@mail.com',
+                'password' => Hash::make('password'),
+                'role'     => 'petugas',
+            ],
+            [
+                'name'     => 'Andi Pratama',
+                'email'    => 'peminjam@mail.com',
+                'password' => Hash::make('password'),
+                'role'     => 'peminjam',
+            ],
+        ];
 
-        User::create([
-            'name' => 'Petugas',
-            'email' => 'petugas@mail.com',
-            'password' => Hash::make('password'),
-            'role' => 'petugas'
-        ]);
-
-        User::create([
-            'name' => 'Peminjam 1',
-            'email' => 'user1@mail.com',
-            'password' => Hash::make('password'),
-            'role' => 'peminjam'
-        ]);
-
-        User::create([
-            'name' => 'Peminjam 2',
-            'email' => 'user2@mail.com',
-            'password' => Hash::make('password'),
-            'role' => 'peminjam'
-        ]);
+        foreach ($users as $user) {
+            User::updateOrCreate(['email' => $user['email']], $user);
+        }
     }
 }

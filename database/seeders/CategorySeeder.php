@@ -2,28 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
 use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed 3 kategori aset yang relevan untuk lingkungan sekolah/lab.
      */
     public function run(): void
     {
         $categories = [
-            'Elektronik',
-            'Alat Lab',
-            'Peralatan Kantor'
+            ['name' => 'Elektronik'],
+            ['name' => 'Sains & Alat Ukur'],
+            ['name' => 'Perkakas'],
         ];
 
         foreach ($categories as $category) {
-            Category::create([
-                'name' => $category
-            ]);
+            Category::updateOrCreate(['name' => $category['name']], $category);
         }
     }
 }
