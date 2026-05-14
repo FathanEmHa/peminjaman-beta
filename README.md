@@ -2,6 +2,21 @@
 
 SIPA adalah platform berbasis web yang dirancang untuk mengelola peminjaman dan pengembalian alat secara efisien. Proyek ini dikembangkan sebagai tugas Uji Kompetensi Keahlian (UKK/Ujikom) Rekayasa Perangkat Lunak dan telah mendapatkan predikat Sangat Kompeten.
 
+## 💡 Masalah & Solusi yang Ditawarkan
+Aplikasi ini dibangun untuk menyelesaikan berbagai kendala operasional yang sering terjadi pada manajemen inventaris fisik/sekolah:
+
+**Masalah yang Sering Terjadi**:
+
+* **Pencatatan Konvensional**: Menggunakan kertas atau spreadsheet manual sering menyebabkan selisih data stok dan riwayat yang hilang.
+* **Kondisi Barang yang Diperdebatkan**: Sering terjadi konflik mengenai kondisi fisik alat (rusak/cacat) antara petugas dan peminjam karena tidak ada bukti saat serah terima.
+* **Keterlambatan Tanpa Pengawasan**: Tidak ada sistem yang melacak batas waktu peminjaman, sehingga alat sering menumpuk di peminjam tanpa status yang jelas.
+
+**Solusi dari SIPA**:
+
+* **Otomasi & Digitalisasi Penuh**: Semua siklus peminjaman tercatat dalam basis data. Sistem akan mengunci stok saat pengajuan (mencegah double-booking) dan memotong stok secara riil saat alat diserahkan.
+* **Bukti Visual (Photo Before/After)**: Mewajibkan dokumentasi foto kondisi barang saat serah terima (ongoing) dan saat dikembalikan (returned), sehingga pertanggungjawaban fisik menjadi jelas.
+* **Pendeteksi Overdue Otomatis**: Menggunakan sistem cron job / scheduler yang berjalan di latar belakang untuk secara otomatis mengubah status transaksi menjadi overdue dan menghitung denda keterlambatan secara presisi.
+
 ## 🚀 Fitur Utama
 
 *   **Manajemen Stok Real-time**: Stok alat akan berkurang secara otomatis ketika status peminjaman berubah menjadi "Ongoing" (setelah pengambilan fisik), memastikan data inventaris tetap akurat.
