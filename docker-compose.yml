@@ -1,40 +1,144 @@
 services:
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # APP — Laravel (Apache) — Main web container
+  # ════════════════════════════════════════════════════════════════════════════
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: sipa-app
+      target: production
+    image: sipa-app:latest
     container_name: sipa-app
     restart: unless-stopped
-    # ports:
-    #   - "8000:80"
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: db          # Internal Docker hostname — resolved via 'internal' network
+      DB_PORT: 3306
     volumes:
-      - .:/var/www/html # Sinkronisasi folder lokal lu ke dalam container (Live Reload)
+      # Persistent storage for uploaded files (photos, etc.)
+      - sipa-storage:/var/www/html/storage/app/public
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 3
     networks:
-      - default
-      - proxy-tier
+      - internal    # Can talk to 'db' container
+      - proxy-tier  # Reachable by Nginx Proxy Manager
 
+  # ════════════════════════════════════════════════════════════════════════════
+  # QUEUE WORKER — Processes jobs stored in the 'jobs' database table
+  # Detected: QUEUE_CONNECTION=database in .env
+  # ════════════════════════════════════════════════════════════════════════════
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: sipa-app:latest       # Reuses the same image — no extra build needed
+    container_name: sipa-queue
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: db
+      DB_PORT: 3306
+      SKIP_CACHE: "true"         # Skip config:cache — app container already handles it
+    volumes:
+      - sipa-storage:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90", "--sleep=3", "--max-time=3600"]
+    networks:
+      - internal
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # SCHEDULER — Runs Laravel's task scheduler every minute
+  # Detected: Schedule::command('loans:check-overdue')->hourly() in routes/console.php
+  # ════════════════════════════════════════════════════════════════════════════
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: sipa-app:latest       # Reuses the same image
+    container_name: sipa-scheduler
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: db
+      DB_PORT: 3306
+      SKIP_CACHE: "true"
+    volumes:
+      - sipa-storage:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    # schedule:work polls artisan schedule:run every 60 seconds natively
+    command: ["php", "artisan", "schedule:work"]
+    networks:
+      - internal
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # DATABASE — MySQL 8.0
+  # Not exposed publicly — only reachable inside the 'internal' network
+  # ════════════════════════════════════════════════════════════════════════════
   db:
     image: mysql:8.0
     container_name: sipa-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}  # (Ini buat password akun root)
-      MYSQL_USER: ${DB_USERNAME}        # (Ini WAJIB ditambahin biar user 'tatan' kebuat)
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3307:3306"
     volumes:
-      - sipa-mysql-data:/var/lib/mysql # Biar data DB gak hilang pas container dimatiin
+      - sipa-mysql-data:/var/lib/mysql
+    # No 'ports' — database is intentionally NOT exposed to the host
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
     networks:
-      - default
+      - internal   # Only reachable by other app containers, never by NPM
 
+# ══════════════════════════════════════════════════════════════════════════════
+# VOLUMES
+# ══════════════════════════════════════════════════════════════════════════════
 volumes:
   sipa-mysql-data:
+    name: sipa-mysql-data
 
+  sipa-storage:
+    name: sipa-storage
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NETWORKS
+# ══════════════════════════════════════════════════════════════════════════════
 networks:
+  # Internal-only network: app ↔ db ↔ queue ↔ scheduler communication
+  internal:
+    name: sipa-internal
+    driver: bridge
+
+  # External network shared with Nginx Proxy Manager
+  # NPM connects to 'app' container through this network on port 80
   proxy-tier:
     external: true

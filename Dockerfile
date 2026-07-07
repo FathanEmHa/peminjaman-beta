@@ -1,59 +1,123 @@
-FROM php:8.2-apache
+# =============================================================================
+# Stage 1 — Node.js: Build frontend assets (Vite/Tailwind)
+# =============================================================================
+FROM node:20-alpine AS node-builder
 
-# 1. Install dependencies sistem, Node.js, dan NPM (wajib buat Vite/Tailwind)
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm
+WORKDIR /app
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Copy only package files first for better layer caching
+COPY package.json package-lock.json ./
+RUN npm ci --frozen-lockfile
 
-# 2. Install ekstensi PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Copy source files needed by Vite
+COPY vite.config.js postcss.config.js tailwind.config.js ./
+COPY resources/ ./resources/
 
-# 3. Aktifin mod_rewrite Apache
-RUN a2enmod rewrite
+# Build production assets (outputs to public/build/)
+RUN npm run build
 
-# 4. Ubah default folder Apache
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-RUN echo '<Directory /var/www/html/public>\n\
+# =============================================================================
+# Stage 2 — Composer: Install PHP dependencies (no dev)
+# =============================================================================
+FROM composer:2.7 AS composer-builder
+
+WORKDIR /app
+
+# Copy manifests first for dependency-layer caching
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-scripts \
+    --prefer-dist
+
+# Copy application source
+COPY . .
+
+
+# =============================================================================
+# Stage 3 — Final production image (PHP 8.2 + Apache)
+# =============================================================================
+FROM php:8.2-apache AS production
+
+# ── System dependencies ──────────────────────────────────────────────────────
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpng-dev \
+        libonig-dev \
+        libxml2-dev \
+        libzip-dev \
+        zip \
+        unzip \
+        curl \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Apache configuration ─────────────────────────────────────────────────────
+RUN a2enmod rewrite headers
+
+# Point Apache document root to Laravel's public/ directory
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+        /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
+        /etc/apache2/apache2.conf \
+        /etc/apache2/conf-available/*.conf
+
+# Allow .htaccess overrides (required for Laravel routing)
+RUN printf '<Directory ${APACHE_DOCUMENT_ROOT}>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/sipa.conf \
-&& a2enconf sipa
+</Directory>\n' > /etc/apache2/conf-available/laravel.conf \
+    && a2enconf laravel
 
-# 5. Tarik Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# 6. Set working directory
+# ── Application files ────────────────────────────────────────────────────────
 WORKDIR /var/www/html
 
-# 7. Copy semua file project
+# Copy PHP vendor from composer stage
+COPY --from=composer-builder /app/vendor ./vendor
+
+# Copy application source (excluding what's in .dockerignore)
 COPY . .
 
-# 8. Install Vendor (PHP) dan Node Modules (Frontend), lalu Build UI
-RUN composer install --optimize-autoloader --no-dev
-RUN npm install && npm run build
+# Copy compiled frontend assets from node stage
+COPY --from=node-builder /app/public/build ./public/build
 
-# 9. Setup Environment & Database SQLite untuk Demo
-RUN cp .env.example .env
-RUN php artisan key:generate
-RUN touch database/database.sqlite
-RUN php artisan migrate:fresh --seed --force
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
 
-# 10. Bantai symlink lama dan generate baru
-RUN rm -rf public/storage && php artisan storage:link
+# ── Permissions ──────────────────────────────────────────────────────────────
+RUN chown -R www-data:www-data \
+        /var/www/html/storage \
+        /var/www/html/bootstrap/cache \
+    && chmod -R 775 \
+        /var/www/html/storage \
+        /var/www/html/bootstrap/cache
 
-# 11. Kasih hak akses ke Apache (Wajib masukin folder /database biar SQLite bisa ditulis)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/storage /var/www/html/database \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/storage /var/www/html/database
+# ── Entrypoint ───────────────────────────────────────────────────────────────
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost/up || exit 1
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]

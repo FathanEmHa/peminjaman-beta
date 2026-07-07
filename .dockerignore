@@ -1,0 +1,46 @@
+# =============================================================================
+# .dockerignore — SIPA Laravel
+# Excludes files that must NOT be copied into the Docker image.
+# Keeping the build context small = faster builds and smaller images.
+# =============================================================================
+
+# ── Git & IDE ────────────────────────────────────────────────────────────────
+.git
+.gitattributes
+.gitignore
+.editorconfig
+.idea
+.vscode
+
+# ── Node / frontend source (assets are compiled in Stage 1) ─────────────────
+node_modules/
+npm-debug.log*
+
+# ── Local environment file (must be injected at runtime, not baked in) ───────
+.env
+.env.local
+.env.*.local
+
+# ── PHP dev dependencies & testing ──────────────────────────────────────────
+vendor/          # Installed fresh in the composer stage
+phpunit.xml
+tests/
+
+# ── Laravel development artifacts ────────────────────────────────────────────
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/views/
+/storage/logs/
+
+# ── Docker files themselves (no need to copy into the image) ─────────────────
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ── Documentation ────────────────────────────────────────────────────────────
+README.md
+CHANGELOG.md
+
+# ── macOS artifacts ──────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
