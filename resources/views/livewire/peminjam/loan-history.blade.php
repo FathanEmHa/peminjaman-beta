@@ -18,7 +18,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         {{-- Flash Message --}}
         @if (session()->has('message'))
@@ -34,7 +34,7 @@
         @endif
 
         {{-- Section Search & Filter --}}
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
             <div class="w-full sm:w-1/2 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,12 +61,12 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
+            <div class="p-4 sm:p-6 border-b border-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Daftar Transaksi</h3>
             </div>
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-w-full min-w-0 w-full relative min-h-[200px]">
                 <x-loading-overlay wire:loading wire:target="search, status_filter, gotoPage, previousPage, nextPage" message="Menyaring data..." />
                 <table class="w-full text-left whitespace-nowrap text-sm">
                     <thead>
@@ -196,7 +196,7 @@
             </div>
 
             @if(method_exists($loans, 'links') && $loans->hasPages())
-                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <div class="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50">
                     {{ $loans->links() }}
                 </div>
             @endif

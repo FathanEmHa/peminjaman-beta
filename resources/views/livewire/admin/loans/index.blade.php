@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         {{-- ── Flash Notification ──────────────────────────────────── --}}
         @if($flashMessage)

@@ -5,10 +5,10 @@
     --}}
 
     {{-- Card Wrapper --}}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
 
         {{-- ── Header Kartu: Search + Tombol Tambah ────────────────── --}}
-        <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="p-4 sm:p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-800">Data Peminjaman</h3>
             </div>
@@ -50,7 +50,7 @@
         </div>
 
         {{-- ── Tabel ────────────────────────────────────────────────── --}}
-        <div class="overflow-x-auto relative min-h-[200px]">
+        <div class="overflow-x-auto max-w-full min-w-0 w-full relative min-h-[200px]">
             <x-loading-overlay wire:loading wire:target="search" message="Mencari data..." />
 
             <table class="w-full text-left whitespace-nowrap text-sm">

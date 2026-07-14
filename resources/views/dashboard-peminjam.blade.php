@@ -22,12 +22,12 @@
         </div>
     </x-slot>
     
-    <div class="min-h-screen bg-gray-50/50 py-10 mt-4">
-        <div class="max-w-7xl mx-auto space-y-12">
+    <div class="min-h-screen bg-gray-50/50 py-6 sm:py-10 overflow-x-hidden">
+        <div class="max-w-7xl mx-auto space-y-8 lg:space-y-12 min-w-0">
             
             {{-- 1. HERO CONTENT (Normal Background) --}}
             <div class="px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
+                <div class="min-w-0">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 mb-2">
                         Halo, {{ Auth::user()->name }}! 👋
                     </h2>
@@ -49,7 +49,7 @@
 
             {{-- 2. MINI KATALOG (Quick Access) --}}
             <div class="px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-end mb-4 px-1">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-4 px-1">
                     <h3 class="text-lg font-bold text-gray-800">Rekomendasi Alat</h3>
                     <a href="{{ route('peminjam.katalog') }}" wire:navigate.hover class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1 group">
                         Lihat Semua Alat
@@ -57,7 +57,7 @@
                     </a>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     @forelse($recentAssets as $asset)
                         <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all group flex flex-col">
                             <div class="aspect-square bg-gray-50 rounded-xl mb-3 flex items-center justify-center overflow-hidden">
@@ -74,7 +74,7 @@
                             </a>
                         </div>
                     @empty
-                        <div class="col-span-2 md:col-span-4 bg-white rounded-2xl p-8 border border-gray-200 text-center text-gray-500">
+                        <div class="col-span-1 sm:col-span-2 md:col-span-4 bg-white rounded-2xl p-8 border border-gray-200 text-center text-gray-500">
                             Belum ada alat yang tersedia saat ini.
                         </div>
                     @endforelse
@@ -83,7 +83,7 @@
 
             {{-- 3. MINI LOAN HISTORY --}}
             <div class="px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-end mb-4 px-1">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-4 px-1">
                     <h3 class="text-lg font-bold text-gray-800">Aktivitas Peminjaman Terakhir</h3>
                     <a href="{{ route('peminjam.loans.history') }}" wire:navigate.hover class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1 group">
                         Lihat Semua Riwayat
@@ -91,8 +91,8 @@
                     </a>
                 </div>
                 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
+                    <div class="overflow-x-auto max-w-full min-w-0 w-full">
                         <table class="w-full text-left whitespace-nowrap text-sm">
                             <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-xs font-semibold">
                                 <tr>
@@ -107,7 +107,7 @@
                                 @forelse($recentLoans as $loan)
                                     <tr class="hover:bg-indigo-50/50 transition-colors group">
                                         <td class="px-6 py-4 font-medium text-indigo-600">#{{ $loan->id }}</td>
-                                        <td class="px-6 py-4 whitespace-normal min-w-[200px]">
+                                        <td class="px-3 py-4 sm:px-6 whitespace-normal min-w-0 lg:min-w-[200px]">
                                     <ul class="space-y-1 text-gray-700">
                                         {{-- Ambil item pertama saja dari relasi --}}
                                         @if($loan->items->count() > 0)

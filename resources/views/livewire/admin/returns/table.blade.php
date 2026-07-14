@@ -4,10 +4,10 @@
         Tanggung jawab: render tabel riwayat pengembalian, aksi edit & delete.
     --}}
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
 
         {{-- ── Header Kartu: Search + Tombol Manual Entry ──────────── --}}
-        <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="p-4 sm:p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h3 class="text-lg font-bold text-gray-800">Riwayat Pengembalian</h3>
                 <p class="text-xs text-gray-500 mt-1">Master data seluruh aktivitas pengembalian alat.</p>
@@ -44,7 +44,7 @@
         </div>
 
         {{-- ── Tabel ────────────────────────────────────────────────── --}}
-        <div class="overflow-x-auto relative min-h-[200px]">
+        <div class="overflow-x-auto max-w-full min-w-0 w-full relative min-h-[200px]">
             <x-loading-overlay
                 wire:loading
                 wire:target="search, gotoPage, previousPage, nextPage"
@@ -156,7 +156,7 @@
 
         {{-- ── Pagination ───────────────────────────────────────────── --}}
         @if($returnRecords->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            <div class="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50">
                 {{ $returnRecords->links() }}
             </div>
         @endif

@@ -7,7 +7,7 @@
 
     @if($show && $loan)
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
 
                 {{-- ── Header Modal (warna berubah per mode) ──────────── --}}
                 <div class="px-6 py-4 flex justify-between items-center
@@ -30,7 +30,7 @@
                 </div>
 
                 {{-- ── Body Modal ─────────────────────────────────────── --}}
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
 
                     {{-- Info Peminjam (semua mode) --}}
                     <div class="mb-5">
@@ -82,7 +82,7 @@
                                 type="file"
                                 wire:model="photoBefore"
                                 accept="image/*"
-                                class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:ring-2 focus:ring-indigo-500 outline-none file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                class="w-full min-w-0 max-w-full text-sm border border-gray-300 rounded-lg px-3 py-2 mb-1 focus:ring-2 focus:ring-indigo-500 outline-none file:mr-2 sm:file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
                             >
                             @error('photoBefore')
                                 <span class="text-red-500 text-xs block mb-2">{{ $message }}</span>
@@ -112,36 +112,36 @@
                 </div>
 
                 {{-- ── Footer Tombol ───────────────────────────────────── --}}
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3 justify-end">
+                <div class="px-4 sm:px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
                     <button wire:click="closeModal"
-                        class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors">
+                        class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors">
                         Batal
                     </button>
 
                     @if($mode === 'approve_confirm')
                         <button wire:click="approve" wire:loading.attr="disabled"
-                            class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70">
+                            class="w-full sm:w-auto px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                             <span wire:loading.remove wire:target="approve">Setujui Peminjaman</span>
                             <span wire:loading wire:target="approve">Memproses...</span>
                         </button>
 
                     @elseif($mode === 'reject_form')
                         <button wire:click="reject" wire:loading.attr="disabled"
-                            class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70">
+                            class="w-full sm:w-auto px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                             <span wire:loading.remove wire:target="reject">Tolak Peminjaman</span>
                             <span wire:loading wire:target="reject">Memproses...</span>
                         </button>
 
                     @elseif($mode === 'handover')
                         <button wire:click="confirmHandover" wire:loading.attr="disabled"
-                            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70">
+                            class="w-full sm:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                             <span wire:loading.remove wire:target="confirmHandover">Konfirmasi Penyerahan</span>
                             <span wire:loading wire:target="confirmHandover">Mengupload...</span>
                         </button>
 
                     @elseif($mode === 'cancel_confirm')
                         <button wire:click="cancel" wire:loading.attr="disabled"
-                            class="px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-70">
+                            class="w-full sm:w-auto px-6 py-2 bg-gray-700 hover:bg-gray-800 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
                             <span wire:loading.remove wire:target="cancel">Ya, Batalkan</span>
                             <span wire:loading wire:target="cancel">Memproses...</span>
                         </button>

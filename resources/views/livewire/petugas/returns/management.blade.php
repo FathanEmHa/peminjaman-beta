@@ -15,7 +15,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         {{-- Flash Message --}}
         @if (session()->has('message'))
@@ -26,7 +26,7 @@
         @endif
 
         {{-- Section Search & Filter --}}
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
             <div class="w-full sm:w-1/3 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -52,7 +52,7 @@
         </div>
 
         {{-- Card Container Tabel --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
             <div class="p-6 border-b border-gray-100 flex items-center gap-2">
                 <div class="p-1.5 bg-gray-50 rounded-md border border-gray-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
@@ -60,7 +60,7 @@
                 <h3 class="text-lg font-bold text-gray-800">Daftar Peminjaman Aktif</h3>
             </div>
 
-            <div class="overflow-x-auto relative min-h-[200px]">
+            <div class="overflow-x-auto max-w-full min-w-0 w-full relative min-h-[200px]">
                 <x-loading-overlay wire:loading wire:target="search, searchAlat, status_filter, gotoPage, previousPage, nextPage" message="Menyaring data..." />
 
                 <table class="w-full text-left whitespace-nowrap text-sm">
@@ -145,7 +145,7 @@
             </div>
 
             @if(method_exists($loans, 'links') && $loans->hasPages())
-                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <div class="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50">
                     {{ $loans->links() }}
                 </div>
             @endif
@@ -155,7 +155,7 @@
     {{-- MODAL 1: PROSES PENGEMBALIAN --}}
     @if($showReturnModal && $selectedLoan)
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
                 <div class="bg-amber-500 px-6 py-4 flex justify-between items-center">
                     <h3 class="text-white font-bold text-lg">Proses Pengembalian Alat</h3>
                     <button wire:click="cancelReturnConfirmation" class="text-amber-100 hover:text-white">
@@ -163,7 +163,7 @@
                     </button>
                 </div>
                 
-                <div class="p-6">
+                <div class="p-4 sm:p-6">
                     <div class="mb-4">
                         <p class="text-xs text-gray-500 uppercase tracking-wider">Peminjam</p>
                         <p class="font-bold text-gray-800 text-lg">{{ $selectedLoan->user->name }} (ID: #{{ $selectedLoan->id }})</p>
@@ -171,7 +171,7 @@
 
                     <label class="block text-[11px] font-medium text-gray-500 mb-1 uppercase tracking-wider">Foto Kondisi (Saat Dikembalikan)</label>
                     <input type="file" wire:model="photo_after" accept="image/*"
-                        class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 mb-3 focus:ring-2 focus:ring-amber-500 outline-none file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 cursor-pointer">
+                        class="w-full min-w-0 max-w-full text-sm border border-gray-300 rounded-lg px-3 py-2 mb-3 focus:ring-2 focus:ring-amber-500 outline-none file:mr-2 sm:file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200 cursor-pointer">
                     @error('photo_after') <span class="text-red-500 text-xs block mb-2">{{ $message }}</span> @enderror
 
                     <label class="block text-[11px] font-medium text-gray-500 mb-1 uppercase tracking-wider">Catatan Kondisi Alat</label>
@@ -198,11 +198,11 @@
                     @endif
                 </div>
 
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-3 justify-end">
-                    <button wire:click="cancelReturnConfirmation" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="px-4 sm:px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                    <button wire:click="cancelReturnConfirmation" class="w-full sm:w-auto px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition-colors">
                         Batal
                     </button>
-                    <button wire:click="confirmReturn" wire:loading.attr="disabled" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center">
+                    <button wire:click="confirmReturn" wire:loading.attr="disabled" class="w-full sm:w-auto px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center">
                         <span wire:loading.remove wire:target="confirmReturn">Terima Barang & Foto</span>
                         <span wire:loading wire:target="confirmReturn">Memproses...</span>
                     </button>
@@ -214,7 +214,7 @@
     {{-- MODAL 2: KELOLA DENDA --}}
     @if($showFineModal && $selectedLoan && $selectedLoan->return)
         <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
                 <div class="bg-rose-600 px-6 py-4 flex justify-between items-center">
                     <h3 class="text-white font-bold text-lg">Kelola Denda</h3>
                     <button wire:click="closeFineModal" class="text-rose-200 hover:text-white">
@@ -222,7 +222,7 @@
                     </button>
                 </div>
 
-                <div class="p-6 bg-rose-50/30">
+                <div class="p-4 sm:p-6 bg-rose-50/30">
                     <div class="text-center mb-6">
                         <p class="text-sm text-gray-500">Peminjam: <span class="font-bold text-gray-800">{{ $selectedLoan->user->name }}</span></p>
                         <p class="text-xs text-gray-400 mt-1">ID Transaksi: #{{ $selectedLoan->id }}</p>
@@ -252,7 +252,7 @@
                     </div>
                 </div>
 
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+                <div class="px-4 sm:px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col gap-2">
                     @if($selectedLoan->return->fine_status == 'unpaid')
                         <x-confirm-modal action="markFineAsPaid({{ $selectedLoan->return->id }})" title="Konfirmasi Pelunasan" message="Apakah denda ini sudah dibayar lunas oleh peminjam?" confirm-text="Tandai Lunas" confirm-color="emerald">
                             <x-slot name="trigger">

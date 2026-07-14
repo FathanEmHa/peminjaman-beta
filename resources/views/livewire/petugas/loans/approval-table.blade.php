@@ -1,11 +1,11 @@
 <div>
     {{-- approval-table.blade.php — Child: tabel daftar transaksi --}}
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
 
         {{-- Header Kartu --}}
         <div
-            class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            class="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div class="flex items-center gap-2">
                 <div class="p-1.5 bg-gray-50 rounded-md border border-gray-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none"
@@ -27,7 +27,7 @@
         </div>
 
         {{-- Tabel --}}
-        <div class="overflow-x-auto relative min-h-[200px]">
+        <div class="overflow-x-auto max-w-full min-w-0 w-full relative min-h-[200px]">
             <x-loading-overlay wire:loading
                 wire:target="search, searchAlat, statusFilter, gotoPage, previousPage, nextPage"
                 message="Menyaring data..." />
@@ -166,7 +166,7 @@
 
         {{-- Pagination --}}
         @if(method_exists($loans, 'links') && $loans->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            <div class="px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50">
                 {{ $loans->links() }}
             </div>
         @endif

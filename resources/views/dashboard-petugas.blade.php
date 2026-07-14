@@ -18,12 +18,12 @@
         </div>
     </x-slot>
     
-    <div class="min-h-screen bg-gray-50/50 py-10 mt-4">
-        <div class="max-w-7xl mx-auto space-y-12">
+    <div class="min-h-screen bg-gray-50/50 py-6 sm:py-10 overflow-x-hidden">
+        <div class="max-w-7xl mx-auto space-y-8 lg:space-y-12 min-w-0">
             
             {{-- 1. HERO CONTENT --}}
             <div class="px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
+                <div class="min-w-0">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 mb-2">
                         Halo, {{ Auth::user()->name }}! 👋
                     </h2>
@@ -49,14 +49,14 @@
             {{-- 2. QUICK STATS --}}
             <div class="px-4 sm:px-6 lg:px-8">
                 <h3 class="text-lg font-bold text-gray-800 mb-4 px-1">Ringkasan Operasional</h3>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     
                     {{-- Stat 1: Pending --}}
                     <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4 hover:border-yellow-200 transition-colors">
-                        <div class="p-3 bg-yellow-50 text-yellow-600 rounded-xl">
+                        <div class="p-3 bg-yellow-50 text-yellow-600 rounded-xl shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-500">Menunggu ACC</p>
                             <h4 class="text-2xl font-black text-gray-900">{{ $stats['pending'] ?? 0 }}</h4>
                         </div>
@@ -67,7 +67,7 @@
                         <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-500">Sedang Dipinjam</p>
                             <h4 class="text-2xl font-black text-gray-900">{{ $stats['ongoing'] ?? 0 }}</h4>
                         </div>
@@ -75,10 +75,10 @@
 
                     {{-- Stat 3: Overdue --}}
                     <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4 hover:border-rose-200 transition-colors">
-                        <div class="p-3 bg-rose-50 text-rose-600 rounded-xl">
+                        <div class="p-3 bg-rose-50 text-rose-600 rounded-xl shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-500">Telat Kembali</p>
                             <h4 class="text-2xl font-black text-rose-600">{{ $stats['overdue'] ?? 0 }}</h4>
                         </div>
@@ -86,10 +86,10 @@
 
                     {{-- Stat 4: Asset Stok --}}
                     <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4 hover:border-blue-200 transition-colors">
-                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                         </div>
-                        <div>
+                        <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-500">Total Alat Aktif</p>
                             <h4 class="text-2xl font-black text-gray-900">{{ $stats['total_assets'] ?? 0 }}</h4>
                         </div>
@@ -100,7 +100,7 @@
 
             {{-- 3. MINI TABLE --}}
             <div class="px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-end mb-4 px-1">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-4 px-1">
                     <h3 class="text-lg font-bold text-gray-800">Transaksi Perlu Tindakan</h3>
                     {{-- Link ubah jadi Indigo --}}
                     <a href="{{ route('petugas.approval') }}" wire:navigate.hover class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1 group">
@@ -109,8 +109,8 @@
                     </a>
                 </div>
                 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
+                    <div class="overflow-x-auto max-w-full min-w-0 w-full">
                         <table class="w-full text-left whitespace-nowrap text-sm">
                             <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-xs font-semibold">
                                 <tr>
@@ -129,7 +129,7 @@
                                             <div class="font-bold text-gray-800">{{ $loan->user->name ?? 'User' }}</div>
                                             <div class="text-xs text-gray-500 mt-0.5">{{ \Carbon\Carbon::parse($loan->loan_date)->format('d M, H:i') }}</div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-normal min-w-[200px]">
+                                        <td class="px-3 py-4 sm:px-6 whitespace-normal min-w-0 lg:min-w-[200px]">
                                             <ul class="space-y-1 text-gray-700">
                                                 @if($loan->items->count() > 0)
                                                     @php $firstItem = $loan->items->first(); @endphp

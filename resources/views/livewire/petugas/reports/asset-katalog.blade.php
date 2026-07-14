@@ -18,7 +18,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         {{-- Section Search & Filter --}}
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center">

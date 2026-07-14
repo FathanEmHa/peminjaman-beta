@@ -15,7 +15,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0 overflow-x-hidden">
         
         {{-- Pesan Error / Success (Global) --}}
         @if (session()->has('error'))
@@ -79,10 +79,10 @@
                                 <h4 class="font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2">{{ $asset->name }}</h4>
                                 <p class="text-xs text-gray-500 mb-4">{{ $asset->category->name ?? 'Tanpa Kategori' }}</p>
 
-                                <div class="mt-auto flex items-center gap-2">
-                                    <input type="number" wire:model="quantities.{{ $asset->id }}" min="1" max="{{ $asset->realtime_stock }}" class="w-16 border border-gray-300 rounded-lg px-2 py-1.5 text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="1" {{ $asset->realtime_stock <= 0 ? 'disabled' : '' }}>
+                                <div class="mt-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                                    <input type="number" wire:model="quantities.{{ $asset->id }}" min="1" max="{{ $asset->realtime_stock }}" class="w-full sm:w-16 min-w-0 border border-gray-300 rounded-lg px-2 py-1.5 text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="1" {{ $asset->realtime_stock <= 0 ? 'disabled' : '' }}>
                                     
-                                    <button wire:click="addToCart({{ $asset->id }})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" {{ $asset->realtime_stock <= 0 ? 'disabled' : '' }}>
+                                    <button wire:click="addToCart({{ $asset->id }})" class="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed" {{ $asset->realtime_stock <= 0 ? 'disabled' : '' }}>
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                                         Keranjang
                                     </button>
@@ -147,12 +147,12 @@
                     <div class="p-5 border-t border-gray-100 bg-gray-50/50 rounded-b-xl space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Tgl Pinjam <span class="text-red-500">*</span></label>
-                            <input type="datetime-local" wire:model="loan_date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="datetime-local" wire:model="loan_date" class="w-full min-w-0 max-w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             @error('loan_date') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Tgl Kembali <span class="text-red-500">*</span></label>
-                            <input type="datetime-local" wire:model="return_date" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="datetime-local" wire:model="return_date" class="w-full min-w-0 max-w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             @error('return_date') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
                         

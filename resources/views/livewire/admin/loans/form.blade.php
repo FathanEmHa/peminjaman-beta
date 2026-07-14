@@ -6,7 +6,7 @@
     --}}
 
     @if($showForm)
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 min-w-0">
 
         {{-- ── Header Form ──────────────────────────────────────── --}}
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
@@ -86,13 +86,13 @@
                 </div>
 
                 {{-- Timeline --}}
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Waktu Pinjam <span class="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" wire:model="loanDate"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                            class="w-full min-w-0 max-w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                         @error('loanDate') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div>
@@ -100,7 +100,7 @@
                             Waktu Kembali <span class="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" wire:model="returnDate"
-                            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                            class="w-full min-w-0 max-w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                         @error('returnDate') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -132,11 +132,11 @@
                     {{-- Jumlah + Tombol Tambah --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
-                        <div class="flex gap-2">
+                        <div class="flex flex-col sm:flex-row gap-2">
                             <input type="number" wire:model="quantity" min="1"
-                                class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                                class="w-full sm:flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                             <button wire:click="addToCart"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors shadow-sm">
+                                class="w-full sm:w-auto shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors shadow-sm">
                                 Tambah
                             </button>
                         </div>
@@ -147,7 +147,8 @@
                 @endif
 
                 {{-- Tabel Cart --}}
-                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <div class="border border-gray-200 rounded-lg overflow-hidden min-w-0">
+                    <div class="overflow-x-auto max-w-full min-w-0 w-full">
                     <table class="w-full text-sm text-left">
                         <thead class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500">
                             <tr>
@@ -183,6 +184,7 @@
                             @endforelse
                         </tbody>
                     </table>
+                    </div>
                 </div>
                 @error('cart') <span class="text-red-500 text-xs block">{{ $message }}</span> @enderror
 
@@ -200,11 +202,11 @@
         </div>
 
         {{-- ── Footer Tombol ────────────────────────────────────── --}}
-        <div class="mt-8 pt-5 border-t border-gray-100 flex items-center gap-3">
+        <div class="mt-8 pt-5 border-t border-gray-100 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <button
                 wire:click="{{ $isEdit ? 'update' : 'store' }}"
                 wire:loading.attr="disabled"
-                class="inline-flex justify-center items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70"
+                class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70"
             >
                 <span wire:loading.remove wire:target="{{ $isEdit ? 'update' : 'store' }}">
                     {{ $isEdit ? 'Simpan Perubahan' : 'Buat Peminjaman' }}
@@ -218,7 +220,7 @@
                 </span>
             </button>
             <button wire:click="resetForm"
-                class="inline-flex justify-center items-center px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
+                class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
                 Batal
             </button>
         </div>

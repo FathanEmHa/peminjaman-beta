@@ -18,7 +18,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
         
         {{-- Flash Messages --}}
         @if (session()->has('message'))
@@ -40,7 +40,7 @@
         @endif
 
         {{-- Form Card --}}
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all">
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 transition-all min-w-0">
             <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
                 <div class="p-1.5 bg-indigo-50 rounded-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,24 +52,24 @@
                 </h3>
             </div>
 
-            <form wire:submit.prevent="{{ $isEdit ? 'update' : 'store' }}">
+            <form wire:submit.prevent="{{ $isEdit ? 'update' : 'store' }}" class="min-w-0">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 break-words">Nama Lengkap <span class="text-red-500">*</span></label>
                         <input type="text" wire:model="name" placeholder="Masukkan nama lengkap..." 
                             class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                         @error('name') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Email <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 break-words">Alamat Email <span class="text-red-500">*</span></label>
                         <input type="email" wire:model="email" placeholder="contoh@email.com" 
                             class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                         @error('email') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peran (Role) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1 break-words">Peran (Role) <span class="text-red-500">*</span></label>
                         <select wire:model="role" 
                             class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all bg-white">
                             <option value="">-- Pilih Role --</option>
@@ -81,7 +81,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1 break-words">
                             Password 
                             @if($isEdit)
                                 <span class="text-gray-400 font-normal text-xs">(Kosongkan jika tidak diubah)</span>
@@ -95,8 +95,8 @@
                     </div>
                 </div>
                 
-                <div class="mt-8 pt-5 border-t border-gray-100 flex items-center gap-3">
-                    <button type="submit" wire:loading.attr="disabled" class="inline-flex justify-center items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70">
+                <div class="mt-8 pt-5 border-t border-gray-100 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+                    <button type="submit" wire:loading.attr="disabled" class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70">
                         <span wire:loading.remove wire:target="{{ $isEdit ? 'update' : 'store' }}">
                             {{ $isEdit ? 'Simpan Perubahan' : 'Simpan Pengguna' }}
                         </span>
@@ -106,7 +106,7 @@
                         </span>
                     </button>
                     @if($isEdit)
-                        <button type="button" wire:click="resetFields" class="inline-flex justify-center items-center px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
+                        <button type="button" wire:click="resetFields" class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
                             Batal
                         </button>
                     @endif
@@ -115,11 +115,11 @@
         </div>
 
         {{-- Table Card --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
+            <div class="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between">
                 <h3 class="text-lg font-bold text-gray-800">Daftar Pengguna</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-w-full min-w-0 w-full">
                 <table class="w-full text-left whitespace-nowrap text-sm">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-xs font-semibold">

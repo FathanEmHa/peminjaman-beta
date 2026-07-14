@@ -24,10 +24,10 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         {{-- 1. SECTION ALAT (HORIZONTAL SCROLL) --}}
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <h3 class="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                 Daftar Alat yang Dipinjam
@@ -51,7 +51,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
             
             {{-- Box Waktu --}}
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
                 <h3 class="text-base font-bold text-gray-800 mb-6 pb-2 border-b">Informasi Waktu & Log</h3>
                 <div class="space-y-6 flex-1 flex flex-col justify-center">
                     <div class="flex items-start gap-4">
@@ -89,9 +89,9 @@
             </div>
 
             {{-- Box Dokumentasi --}}
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+            <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
                 <h3 class="text-base font-bold text-gray-800 mb-6 pb-2 border-b">Dokumentasi Fisik</h3>
-                <div class="grid grid-cols-2 gap-4 flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                     {{-- Foto Sebelum --}}
                     <div class="relative group h-full border-2 border-dashed border-gray-200 rounded-xl overflow-hidden flex flex-col">
                         <div class="bg-gray-100 py-1.5 text-center text-[10px] font-black uppercase text-gray-500 tracking-widest">Awal</div>
@@ -130,7 +130,7 @@
 
         @if($hasFine)
             <div class="bg-white rounded-2xl shadow-sm border border-rose-100 overflow-hidden">
-                <div class="bg-rose-600 px-6 py-4 flex justify-between items-center text-white">
+                <div class="bg-rose-600 px-4 py-4 sm:px-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 text-white">
                     <h3 class="font-bold text-lg">Tagihan Denda</h3>
                     @if($loan->status == 'returned')
                         <a href="{{ route('nota.denda', $loan->id) }}" target="_blank" class="bg-white text-rose-600 px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-rose-50 transition">
@@ -157,7 +157,7 @@
 
                     <div class="w-full md:w-auto flex flex-col items-center md:items-end">
                         <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Harus Dibayar</p>
-                        <p class="text-4xl font-black text-rose-600 leading-none py-1">Rp {{ number_format($totalFine, 0, ',', '.') }}</p>
+                        <p class="text-2xl sm:text-4xl font-black text-rose-600 leading-none py-1 break-words">Rp {{ number_format($totalFine, 0, ',', '.') }}</p>
                         <div class="mt-2">
                             @if($loan->status == 'returned')
                                 <span class="px-4 py-1 rounded-full text-[10px] font-black tracking-widest border {{ $isPaid ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-rose-50 text-rose-600 border-rose-200' }}">

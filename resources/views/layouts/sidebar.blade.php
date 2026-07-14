@@ -1,10 +1,16 @@
-<aside class="w-64 bg-gray-900 text-white flex flex-col h-screen overflow-y-auto shrink-0 shadow-lg">
+<aside
+    class="w-64 bg-gray-900 text-white flex flex-col h-screen overflow-y-auto shrink-0 shadow-lg fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out -translate-x-full lg:static lg:translate-x-0 lg:z-auto"
+    :class="{ 'translate-x-0': sidebarOpen }"
+>
     <div
         class="h-16 flex items-center justify-center border-b border-gray-800 font-bold text-xl tracking-wider shrink-0">
         PINJAM<span class="text-indigo-500">ALAT</span>
     </div>
 
-    <nav class="flex-1 px-4 py-6 space-y-2 text-sm font-medium">
+    <nav
+        class="flex-1 px-4 py-6 space-y-2 text-sm font-medium"
+        @click="if ($event.target.closest('a[href]')) sidebarOpen = false"
+    >
 
         <a href="{{ route('dashboard') }}" wire:navigate.hover
             class="block px-4 py-2 rounded-md hover:bg-gray-800 hover:text-indigo-400 transition {{ request()->routeIs('*.dashboard') ? 'bg-gray-800 text-indigo-400' : 'text-gray-300' }}">

@@ -18,9 +18,9 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0 overflow-x-hidden">
+        <div class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden min-w-0">
+            <div class="overflow-x-auto max-w-full min-w-0 w-full">
                 <table class="w-full text-left whitespace-nowrap">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider">

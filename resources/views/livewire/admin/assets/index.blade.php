@@ -19,7 +19,7 @@
         </div>
     </x-slot>
 
-    <div class="py-10 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 min-w-0 overflow-x-hidden">
 
         @if (session()->has('message'))
             <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl shadow-sm"
@@ -33,7 +33,7 @@
             </div>
         @endif
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 min-w-0">
             <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <div class="p-1.5 bg-indigo-50 rounded-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,7 +43,7 @@
                 {{ $isEdit ? 'Edit Data Alat' : 'Tambah Alat Baru' }}
             </h3>
 
-            <form wire:submit.prevent="{{ $isEdit ? 'update' : 'store' }}">
+            <form wire:submit.prevent="{{ $isEdit ? 'update' : 'store' }}" class="min-w-0">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                     
                     {{-- Input Nama Alat --}}
@@ -82,7 +82,7 @@
                             Foto Alat <span class="text-gray-400 font-normal">(Max 2MB)</span>
                         </label>
                         <input type="file" wire:model="photo" accept="image/*"
-                            class="w-full border border-gray-300 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            class="w-full min-w-0 max-w-full border border-gray-300 px-3 py-1.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm file:mr-2 sm:file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                         @error('photo') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         
                         {{-- Preview Foto (Bisa Foto Lama / Preview Baru) --}}
@@ -99,14 +99,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 border-t border-gray-100 pt-4">
+                <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 border-t border-gray-100 pt-4">
                     <button type="submit"
-                        class="inline-flex justify-center items-center px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all shadow-sm">
+                        class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all shadow-sm">
                         {{ $isEdit ? 'Update Alat' : 'Simpan Alat' }}
                     </button>
                     @if($isEdit)
                         <button type="button" wire:click="resetFields"
-                            class="inline-flex justify-center items-center px-5 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
+                            class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
                             Batal Edit
                         </button>
                     @endif
@@ -115,8 +115,8 @@
         </div>
 
         {{-- TABEL ASSETS DENGAN THUMBNAIL FOTO --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-w-0">
+            <div class="overflow-x-auto max-w-full min-w-0 w-full">
                 <table class="w-full text-left whitespace-nowrap">
                     <thead>
                         <tr

@@ -6,7 +6,7 @@
     --}}
 
     @if($showForm)
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 min-w-0">
 
         {{-- ── Header Form ──────────────────────────────────────── --}}
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
@@ -134,11 +134,11 @@
         </div>
 
         {{-- ── Footer Tombol ────────────────────────────────────── --}}
-        <div class="mt-8 pt-5 border-t border-gray-100 flex items-center gap-3">
+        <div class="mt-8 pt-5 border-t border-gray-100 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
             <button
                 wire:click="{{ $isEdit ? 'update' : 'store' }}"
                 wire:loading.attr="disabled"
-                class="inline-flex justify-center items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70"
+                class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all disabled:opacity-70"
             >
                 <span wire:loading.remove wire:target="{{ $isEdit ? 'update' : 'store' }}">
                     {{ $isEdit ? 'Simpan Perubahan' : 'Buat Record Pengembalian' }}
@@ -152,7 +152,7 @@
                 </span>
             </button>
             <button wire:click="resetForm"
-                class="inline-flex justify-center items-center px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
+                class="inline-flex justify-center items-center w-full sm:w-auto px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-100 transition-all">
                 Batal
             </button>
         </div>
