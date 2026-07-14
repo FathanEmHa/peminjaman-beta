@@ -29,6 +29,8 @@ Aplikasi ini dibangun untuk menyelesaikan berbagai kendala operasional yang seri
 *   **Dashboard Interaktif**: Memantau jumlah alat tersedia, alat dipinjam, dan status peminjaman secara cepat.
 *   **Laporan Terpadu**: Sistem pelaporan peminjaman dan pencatatan log aktivitas otomatis yang memudahkan admin dalam melakukan audit.
 *   **Otorisasi Multi-Peran**: Sistem hak akses yang membedakan fitur untuk Admin (Master Data), Petugas (Verifikasi), dan Peminjam (Pengajuan).
+*   **Desain Responsif**: Tampilan menyesuaikan otomatis di berbagai ukuran layar (desktop, tablet, hingga mobile), jadi Admin, Petugas, maupun Peminjam tetap nyaman mengakses sistem lewat perangkat apa pun.
+*   **Tampilan Responsif**: Antarmuka menyesuaikan dari desktop hingga mobile, termasuk sidebar navigasi yang berubah jadi overlay/drawer di layar kecil, sehingga tetap nyaman diakses dari perangkat apa pun.
 
 ---
 
