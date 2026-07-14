@@ -5,6 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotaController;
 use App\Http\Controllers\Shared\DashboardController;
 
+Route::get('/debug-scheme', function () {
+    return response()->json([
+        'is_secure' => request()->isSecure(),
+        'scheme' => request()->getScheme(),
+        'x_forwarded_proto' => request()->header('X-Forwarded-Proto'),
+        'all_headers' => request()->headers->all(),
+    ]);
+});
+
 Route::redirect('/', '/login');
 
 Route::middleware(['auth'])->group(function () {
