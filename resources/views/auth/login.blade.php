@@ -110,14 +110,6 @@
             </div>
             <div class="space-y-2">
                 <div class="flex items-start justify-between gap-2">
-                    <span class="text-xs font-semibold text-gray-500 w-16 flex-shrink-0 pt-0.5">Admin</span>
-                    <div class="text-right">
-                        <p class="text-xs font-mono font-semibold text-gray-800 select-all">admin@mail.com</p>
-                        <p class="text-xs text-gray-400 font-mono">Pass: password</p>
-                    </div>
-                </div>
-                <div class="h-px bg-indigo-100"></div>
-                <div class="flex items-start justify-between gap-2">
                     <span class="text-xs font-semibold text-gray-500 w-16 flex-shrink-0 pt-0.5">Petugas</span>
                     <div class="text-right">
                         <p class="text-xs font-mono font-semibold text-gray-800 select-all">petugas@mail.com</p>
